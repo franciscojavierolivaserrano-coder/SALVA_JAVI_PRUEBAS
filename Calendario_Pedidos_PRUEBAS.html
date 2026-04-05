@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calendario de Pedidos — Grupo Salmarfer SL</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f5f5f5; color: #1a1a1a; min-height: 100vh; }
+  header { background: #5C3317; color: white; padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header span { font-size: 13px; opacity: 0.75; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+  .toolbar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; background: white; padding: 14px 16px; border-radius: 10px; border: 1px solid #e0e0e0; }
+  .nav-btn { background: none; border: 1px solid #ccc; border-radius: 8px; padding: 6px 16px; cursor: pointer; font-size: 14px; color: #333; }
+  .nav-btn:hover { background: #f0f0f0; }
+  .month-label { font-size: 17px; font-weight: 600; min-width: 180px; text-align: center; color: #5C3317; }
+  select { font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid #ccc; background: white; color: #333; cursor: pointer; }
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px; }
+  .leg-item { display: flex; align-items: center; gap: 7px; font-size: 12px; color: #666; }
+  .leg-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+  .cal-wrap { background: white; border-radius: 10px; border: 1px solid #e0e0e0; padding: 16px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 5px; }
+  .day-name { text-align: center; font-size: 12px; color: #888; padding: 6px 0; font-weight: 600; }
+  .day-cell { min-height: 90px; border: 1px solid #ebebeb; border-radius: 8px; padding: 7px; background: white; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s; }
+  .day-cell:hover { border-color: #8B5E3C; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .day-cell.empty { background: #fafafa; cursor: default; border-color: transparent; }
+  .day-cell.today { border-color: #1565C0; }
+  .day-cell.sunday { background: #fafafa; cursor: default; }
+  .day-num { font-size: 12px; font-weight: 600; color: #999; margin-bottom: 5px; }
+  .day-cell.today .day-num { color: #1565C0; }
+  .day-cell.sunday .day-num { color: #ccc; }
+  .pill { font-size: 10px; padding: 2px 7px; border-radius: 20px; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+  .pill-var { background: #E3F2FD; color: #1565C0; }
+  .pill-so  { background: #E8F5E9; color: #2E7D32; }
+  .pill-uni { background: #FFF3E0; color: #E65100; }
+  .pill-sep { background: #EDE7F6; color: #4527A0; }
+  .more-lbl { font-size: 10px; color: #bbb; margin-top: 2px; }
+  .sun-lbl { font-size: 10px; color: #ccc; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: 12px; padding: 24px; width: min(520px, 95vw); max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+  .modal-title { font-size: 16px; font-weight: 600; color: #5C3317; }
+  .close-btn { background: none; border: none; cursor: pointer; font-size: 20px; color: #aaa; line-height: 1; }
+  .close-btn:hover { color: #333; }
+  .order-row { padding: 10px 0; border-bottom: 1px solid #f5f5f5; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .order-row:last-child { border-bottom: none; }
+  .order-client { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+  .order-ruta { font-size: 12px; color: #888; margin-top: 2px; }
+  .order-prods { font-size: 12px; color: #555; margin-top: 4px; line-height: 1.5; }
+  .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; }
+  .empty-msg { text-align: center; padding: 32px; font-size: 14px; color: #bbb; }
+  .stats-bar { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat-card { background: white; border: 1px solid #e0e0e0; border-radius: 10px; padding: 12px 18px; flex: 1; min-width: 120px; }
+  .stat-label { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .stat-val { font-size: 22px; font-weight: 600; color: #5C3317; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Calendario de Pedidos</h1>
+    <span>Grupo Salmarfer SL</span>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="stats-bar">
+    <div class="stat-card"><div class="stat-label">Pedidos este mes</div><div class="stat-val" id="statTotal">—</div></div>
+    <div class="stat-card"><div class="stat-label">Standing Orders</div><div class="stat-val" id="statSO">—</div></div>
+    <div class="stat-card"><div class="stat-label">Variables</div><div class="stat-val" id="statVar">—</div></div>
+    <div class="stat-card"><div class="stat-label">Clientes activos</div><div class="stat-val" id="statCli">—</div></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="nav-btn" id="prev">&#8592;</button>
+    <span class="month-label" id="monthLabel"></span>
+    <button class="nav-btn" id="next">&#8594;</button>
+    <select id="clienteFilter"><option value="">Todos los clientes</option></select>
+    <select id="rutaFilter">
+      <option value="">Todas las rutas</option>
+      <option>Ruta 1</option><option>Ruta 2</option>
+      <option>Ruta 3</option><option>Ruta 4</option>
+    </select>
+    <select id="tipoFilter">
+      <option value="">Todos los tipos</option>
+      <option>Variable</option>
+      <option>Standing Order</option>
+      <option>Sáb+Dom Unificado</option>
+      <option>Sáb+Dom Separado</option>
+    </select>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#1565C0"></div>Variable</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#2E7D32"></div>Standing Order</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#E65100"></div>Sáb+Dom unificado</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#4527A0"></div>Sáb+Dom separado</div>
+  </div>
+
+  <div class="cal-wrap">
+    <div class="cal-grid" id="dayNames"></div>
+    <div class="cal-grid" id="calGrid" style="margin-top:5px;"></div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle"></span>
+      <button class="close-btn" id="closeModal">&#x2715;</button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+const clientes = [
+  {nombre:"Los Llanos",ruta:"Ruta 1"},{nombre:"Virgen del Rocío",ruta:"Ruta 1"},
+  {nombre:"Don Curro",ruta:"Ruta 1"},{nombre:"Metropol",ruta:"Ruta 1"},
+  {nombre:"Monte Tradición Bormujos",ruta:"Ruta 1"},{nombre:"Café Tarifa",ruta:"Ruta 1"},
+  {nombre:"Tete",ruta:"Ruta 1"},{nombre:"Bada",ruta:"Ruta 1"},
+  {nombre:"Triángulo Camas",ruta:"Ruta 1"},{nombre:"Sintra",ruta:"Ruta 1"},
+  {nombre:"Chaparral",ruta:"Ruta 1"},{nombre:"Jade",ruta:"Ruta 1"},
+  {nombre:"Califa",ruta:"Ruta 1"},{nombre:"Fune",ruta:"Ruta 1"},{nombre:"Alcalá",ruta:"Ruta 1"},
+  {nombre:"Peña Bética",ruta:"Ruta 2"},{nombre:"Casa Diego",ruta:"Ruta 2"},
+  {nombre:"Bravo",ruta:"Ruta 2"},{nombre:"Baronesa",ruta:"Ruta 2"},
+  {nombre:"Yismi",ruta:"Ruta 2"},{nombre:"Tabala",ruta:"Ruta 2"},
+  {nombre:"Nuevo Lux",ruta:"Ruta 2"},{nombre:"Esquinita",ruta:"Ruta 2"},
+  {nombre:"Arzúa",ruta:"Ruta 2"},{nombre:"Cuna",ruta:"Ruta 2"},
+  {nombre:"Pola Vieja",ruta:"Ruta 2"},{nombre:"Catunambú",ruta:"Ruta 2"},
+  {nombre:"Vinoque",ruta:"Ruta 2"},{nombre:"Hotel Palacio Alcázar",ruta:"Ruta 2"},
+  {nombre:"Alacena",ruta:"Ruta 2"},{nombre:"Las Lapas",ruta:"Ruta 2"},
+  {nombre:"Columna",ruta:"Ruta 2"},{nombre:"Galería",ruta:"Ruta 2"},
+  {nombre:"Paradita",ruta:"Ruta 3"},{nombre:"Maraver",ruta:"Ruta 3"},
+  {nombre:"Clarines",ruta:"Ruta 3"},{nombre:"Carlos Alberto",ruta:"Ruta 3"},
+  {nombre:"Monte Tradición Santa Clara",ruta:"Ruta 3"},
+  {nombre:"Peña Sevillista",ruta:"Ruta 3"},{nombre:"Frutería José",ruta:"Ruta 3"},
+  {nombre:"Casa Paco",ruta:"Ruta 4"},{nombre:"Botellín San Jerónimo",ruta:"Ruta 4"},
+  {nombre:"Botellín Triana",ruta:"Ruta 4"},{nombre:"Triana Bar",ruta:"Ruta 4"},
+  {nombre:"Las Golondrinas Antillano",ruta:"Ruta 4"},
+  {nombre:"Las Golondrinas Pagés del Corro",ruta:"Ruta 4"},
+  {nombre:"Abacería del Postigo",ruta:"Ruta 4"},{nombre:"Callejuela",ruta:"Ruta 4"},
+  {nombre:"Mandala",ruta:"Ruta 4"},{nombre:"Oído Cocina",ruta:"Ruta 4"}
+];
+
+const tipos = ["Variable","Standing Order","Sáb+Dom Unificado","Sáb+Dom Separado"];
+const productos = ["Bollo Grande","Mollete Chico","Integral Grande","Prieto Grande","Baguette","Burguer 150","Pan de Pueblo","Hallulla Grande","Yeye","Chatocao 125"];
+
+function rndInt(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
+
+function genPedidos(){
+  const pedidos=[];
+  const now=new Date();
+  for(let m=-2;m<=0;m++){
+    const base=new Date(now.getFullYear(),now.getMonth()+m,1);
+    const dias=new Date(base.getFullYear(),base.getMonth()+1,0).getDate();
+    for(let d=1;d<=dias;d++){
+      const fecha=new Date(base.getFullYear(),base.getMonth(),d);
+      if(fecha.getDay()===0) continue;
+      const nPed=rndInt(4,12);
+      const usados=new Set();
+      for(let i=0;i<nPed;i++){
+        let ci; let tries=0;
+        do{ ci=rndInt(0,clientes.length-1); tries++; }while(usados.has(ci)&&tries<30);
+        usados.add(ci);
+        const c=clientes[ci];
+        const dow=fecha.getDay();
+        const tipo=dow===6&&Math.random()<0.3?tipos[rndInt(2,3)]:Math.random()<0.4?tipos[1]:tipos[0];
+        const nP=rndInt(1,4);
+        const prods=[];
+        for(let p=0;p<nP;p++) prods.push({prod:productos[rndInt(0,productos.length-1)],cant:rndInt(5,50)});
+        pedidos.push({fecha,cliente:c.nombre,ruta:c.ruta,tipo,prods});
+      }
+    }
+  }
+  return pedidos;
+}
+
+const allPedidos = genPedidos();
+
+const selCli = document.getElementById('clienteFilter');
+clientes.forEach(c=>{
+  const o=document.createElement('option');
+  o.value=c.nombre; o.textContent=c.nombre+'  ('+c.ruta+')';
+  selCli.appendChild(o);
+});
+
+const diasNombre=["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+const dn=document.getElementById('dayNames');
+diasNombre.forEach(d=>{
+  const div=document.createElement('div');
+  div.className='day-name'; div.textContent=d; dn.appendChild(div);
+});
+
+const meses=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+let curYear=new Date().getFullYear(), curMonth=new Date().getMonth();
+
+function pillCls(tipo){
+  if(tipo==="Variable") return "pill pill-var";
+  if(tipo==="Standing Order") return "pill pill-so";
+  if(tipo==="Sáb+Dom Unificado") return "pill pill-uni";
+  return "pill pill-sep";
+}
+function badgeCls(tipo){
+  if(tipo==="Variable") return "badge pill-var";
+  if(tipo==="Standing Order") return "badge pill-so";
+  if(tipo==="Sáb+Dom Unificado") return "badge pill-uni";
+  return "badge pill-sep";
+}
+function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+
+function getFiltered(){
+  const cF=document.getElementById('clienteFilter').value;
+  const rF=document.getElementById('rutaFilter').value;
+  const tF=document.getElementById('tipoFilter').value;
+  return allPedidos.filter(p=>{
+    if(p.fecha.getFullYear()!==curYear||p.fecha.getMonth()!==curMonth) return false;
+    if(cF&&p.cliente!==cF) return false;
+    if(rF&&p.ruta!==rF) return false;
+    if(tF&&p.tipo!==tF) return false;
+    return true;
+  });
+}
+
+function render(){
+  document.getElementById('monthLabel').textContent=meses[curMonth]+' '+curYear;
+  const filtered=getFiltered();
+
+  document.getElementById('statTotal').textContent=filtered.length;
+  document.getElementById('statSO').textContent=filtered.filter(p=>p.tipo==="Standing Order").length;
+  document.getElementById('statVar').textContent=filtered.filter(p=>p.tipo==="Variable").length;
+  document.getElementById('statCli').textContent=new Set(filtered.map(p=>p.cliente)).size;
+
+  const grid=document.getElementById('calGrid');
+  grid.innerHTML='';
+  const today=new Date();
+  const first=new Date(curYear,curMonth,1);
+  let startDow=first.getDay();
+  startDow=(startDow+6)%7;
+  const daysInMonth=new Date(curYear,curMonth+1,0).getDate();
+
+  for(let i=0;i<startDow;i++){
+    const el=document.createElement('div'); el.className='day-cell empty'; grid.appendChild(el);
+  }
+  for(let d=1;d<=daysInMonth;d++){
+    const date=new Date(curYear,curMonth,d);
+    const isSun=date.getDay()===0;
+    const el=document.createElement('div');
+    el.className='day-cell'+(isSun?' sunday':'')+(sameDay(date,today)?' today':'');
+    const num=document.createElement('div'); num.className='day-num'; num.textContent=d; el.appendChild(num);
+    if(isSun){
+      const lbl=document.createElement('div'); lbl.className='sun-lbl'; lbl.textContent='Sin reparto'; el.appendChild(lbl);
+    } else {
+      const dayPeds=filtered.filter(p=>sameDay(p.fecha,date));
+      dayPeds.slice(0,3).forEach(p=>{
+        const pill=document.createElement('span');
+        pill.className=pillCls(p.tipo); pill.textContent=p.cliente; el.appendChild(pill);
+      });
+      if(dayPeds.length>3){
+        const more=document.createElement('div');
+        more.className='more-lbl'; more.textContent='+'+(dayPeds.length-3)+' más'; el.appendChild(more);
+      }
+      if(dayPeds.length>0) el.addEventListener('click',()=>openModal(date,dayPeds));
+    }
+    grid.appendChild(el);
+  }
+}
+
+function openModal(date,peds){
+  const opts={weekday:'long',day:'numeric',month:'long',year:'numeric'};
+  document.getElementById('modalTitle').textContent=date.toLocaleDateString('es-ES',opts);
+  const body=document.getElementById('modalBody');
+  body.innerHTML='';
+  if(!peds.length){ body.innerHTML='<div class="empty-msg">Sin pedidos este día</div>'; }
+  else {
+    peds.forEach(p=>{
+      const row=document.createElement('div'); row.className='order-row';
+      const info=document.createElement('div');
+      info.innerHTML='<div class="order-client">'+p.cliente+'</div>'
+        +'<div class="order-ruta">'+p.ruta+'</div>'
+        +'<div class="order-prods">'+p.prods.map(x=>x.cant+'x '+x.prod).join(' &bull; ')+'</div>';
+      const badge=document.createElement('span');
+      badge.className=badgeCls(p.tipo); badge.textContent=p.tipo;
+      row.appendChild(info); row.appendChild(badge);
+      body.appendChild(row);
+    });
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+document.getElementById('closeModal').addEventListener('click',()=>document.getElementById('modalOverlay').classList.remove('open'));
+document.getElementById('modalOverlay').addEventListener('click',e=>{ if(e.target===e.currentTarget) e.currentTarget.classList.remove('open'); });
+document.getElementById('prev').addEventListener('click',()=>{ curMonth--; if(curMonth<0){curMonth=11;curYear--;} render(); });
+document.getElementById('next').addEventListener('click',()=>{ curMonth++; if(curMonth>11){curMonth=0;curYear++;} render(); });
+['clienteFilter','rutaFilter','tipoFilter'].forEach(id=>document.getElementById(id).addEventListener('change',render));
+
+render();
+</script>
+</body>
+</html>
