@@ -16,651 +16,99 @@
     --error:#d9534f;
     --shadow:0 1px 4px rgba(0,32,92,0.08);
   }
-
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
-    background:var(--bg);
-    color:#1a1a2e;
-    min-height:100vh;
-    padding-bottom:95px;
-  }
-
-  header{
-    background:var(--azul);
-    position:sticky;
-    top:0;
-    z-index:100;
-    box-shadow:0 2px 10px rgba(0,32,92,0.35);
-  }
-
-  .header-logo{
-    display:flex;
-    justify-content:center;
-    padding:10px 16px 0;
-  }
-
-  .header-logo img{
-    height:52px;
-    width:auto;
-    object-fit:contain;
-    display:none;
-  }
-
-  .header-cliente{
-    background:rgba(0,0,0,0.2);
-    padding:8px 14px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-
-  .cliente-nombre{
-    font-size:13px;
-    font-weight:700;
-    color:var(--white);
-  }
-
-  .cliente-sub{
-    font-size:10px;
-    color:rgba(255,255,255,0.65);
-    margin-top:1px;
-  }
-
-  .oro-dot{
-    width:8px;
-    height:8px;
-    background:var(--oro);
-    border-radius:50%;
-    flex-shrink:0;
-  }
-
-  .fecha-wrap{
-    padding:8px 14px 10px;
-    background:var(--azul);
-  }
-
-  .fecha-label{
-    font-size:11px;
-    color:rgba(255,255,255,0.6);
-    margin-bottom:5px;
-    letter-spacing:0.3px;
-  }
-
-  .fecha-input{
-    width:100%;
-    background:rgba(255,255,255,0.1);
-    border:1px solid rgba(255,255,255,0.25);
-    border-radius:10px;
-    padding:9px 12px;
-    color:var(--white);
-    font-size:12px;
-    -webkit-appearance:none;
-    appearance:none;
-    color-scheme:dark;
-  }
-
-  .domingo-wrap{
-    margin-top:8px;
-    background:rgba(201,168,76,0.15);
-    border:1px solid rgba(201,168,76,0.4);
-    border-radius:10px;
-    padding:10px 12px;
-    display:none;
-  }
-
-  .domingo-wrap.show{
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-
-  .domingo-wrap label{
-    font-size:12px;
-    color:var(--oro);
-    flex:1;
-    line-height:1.4;
-  }
-
-  .domingo-toggle{
-    width:44px;
-    height:26px;
-    background:rgba(255,255,255,0.2);
-    border-radius:13px;
-    position:relative;
-    cursor:pointer;
-    flex-shrink:0;
-    transition:background 0.2s;
-  }
-
-  .domingo-toggle.on{
-    background:var(--oro);
-  }
-
-  .domingo-toggle::after{
-    content:'';
-    position:absolute;
-    top:3px;
-    left:3px;
-    width:20px;
-    height:20px;
-    background:white;
-    border-radius:50%;
-    transition:transform 0.2s;
-  }
-
-  .domingo-toggle.on::after{
-    transform:translateX(18px);
-  }
-
-  .resumen-top{
-    background:var(--azul2);
-    padding:6px 12px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-
-  .resumen-top .r-item{
-    flex:1;
-    text-align:center;
-  }
-
-  .resumen-top .r-val{
-    font-size:15px;
-    font-weight:700;
-    color:var(--white);
-  }
-
-  .resumen-top .r-lbl{
-    font-size:9px;
-    color:rgba(255,255,255,0.7);
-  }
-
-  .resumen-top .divider{
-    width:1px;
-    height:24px;
-    background:rgba(255,255,255,0.2);
-  }
-
-  .container{
-    padding:10px;
-  }
-
-  .section-card{
-    background:var(--white);
-    border-radius:12px;
-    margin-bottom:10px;
-    overflow:hidden;
-    box-shadow:var(--shadow);
-  }
-
-  .section-header{
-    background:var(--azul);
-    color:var(--white);
-    padding:9px 14px;
-    font-size:11px;
-    font-weight:700;
-    letter-spacing:0.8px;
-    text-transform:uppercase;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-  }
-
-  .section-header .badge{
-    background:var(--oro);
-    color:var(--azul);
-    border-radius:20px;
-    padding:2px 9px;
-    font-size:11px;
-    font-weight:700;
-    min-width:24px;
-    text-align:center;
-  }
-
-  .product-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:9px 14px;
-    border-bottom:1px solid #f0f2f8;
-    gap:10px;
-    transition:background 0.15s;
-  }
-
-  .product-row:last-child{
-    border-bottom:none;
-  }
-
-  .product-row.active{
-    background:#f0f4ff;
-  }
-
-  .product-name{
-    font-size:13px;
-    color:#1a1a2e;
-    flex:1;
-    line-height:1.3;
-  }
-
-  .product-row.active .product-name{
-    color:var(--azul);
-    font-weight:600;
-  }
-
-  .qty-control{
-    display:flex;
-    align-items:center;
-    flex-shrink:0;
-  }
-
-  .qty-btn{
-    width:30px;
-    height:30px;
-    border:1.5px solid var(--azul2);
-    background:var(--white);
-    color:var(--azul2);
-    font-size:18px;
-    font-weight:300;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    user-select:none;
-    transition:background 0.12s, opacity 0.12s;
-  }
-
-  .qty-btn:first-child{
-    border-radius:10px 0 0 10px;
-  }
-
-  .qty-btn:last-child{
-    border-radius:0 10px 10px 0;
-  }
-
-  .qty-btn:active{
-    background:#e8eef8;
-  }
-
-  .qty-btn:disabled{
-    opacity:0.5;
-    cursor:not-allowed;
-  }
-
-  .qty-input{
-    width:38px;
-    height:30px;
-    border:1.5px solid var(--azul2);
-    border-left:none;
-    border-right:none;
-    text-align:center;
-    font-size:14px;
-    font-weight:700;
-    color:var(--azul);
-    background:var(--white);
-    -moz-appearance:textfield;
-  }
-
-  .qty-input::-webkit-inner-spin-button,
-  .qty-input::-webkit-outer-spin-button{
-    -webkit-appearance:none;
-  }
-
-  .qty-input:focus{
-    outline:none;
-    background:#f0f4ff;
-  }
-
-  .qty-input:disabled{
-    opacity:0.7;
-  }
-
-  .notas-card{
-    background:var(--white);
-    border-radius:12px;
-    margin-bottom:10px;
-    padding:14px;
-    box-shadow:var(--shadow);
-  }
-
-  .notas-card label{
-    font-size:12px;
-    font-weight:700;
-    color:var(--azul);
-    display:block;
-    margin-bottom:8px;
-    letter-spacing:0.4px;
-    text-transform:uppercase;
-  }
-
-  .notas-card textarea{
-    width:100%;
-    border:1.5px solid #dde3f0;
-    border-radius:10px;
-    padding:10px 12px;
-    font-size:13px;
-    color:#1a1a2e;
-    resize:none;
-    height:64px;
-    font-family:inherit;
-  }
-
-  .notas-card textarea:focus{
-    outline:none;
-    border-color:var(--azul2);
-  }
-
-  .leyenda{
-    border-left:3px solid var(--oro);
-    background:#fffbf0;
-    border-radius:0 10px 10px 0;
-    padding:10px 12px;
-    font-size:12px;
-    color:#5a4a00;
-    margin-bottom:14px;
-    line-height:1.6;
-  }
-
-  .toast{
-    position:fixed;
-    top:16px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:1000;
-    min-width:240px;
-    max-width:90vw;
-    background:#1a1a2e;
-    color:#fff;
-    padding:12px 16px;
-    border-radius:12px;
-    box-shadow:0 8px 30px rgba(0,0,0,0.25);
-    font-size:14px;
-    display:none;
-  }
-
-  .toast.show{
-    display:block;
-  }
-
-  .toast.error{
-    background:var(--error);
-  }
-
-  .toast.ok{
-    background:var(--ok);
-  }
-
-  .bottom-bar{
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    background:var(--azul);
-    padding:8px 12px 12px;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    box-shadow:0 -2px 12px rgba(0,32,92,0.25);
-    z-index:200;
-  }
-
-  .bottom-info{
-    flex:1;
-    color:var(--white);
-  }
-
-  .bottom-info .b-total{
-    font-size:17px;
-    font-weight:700;
-  }
-
-  .bottom-info .b-sub{
-    font-size:10px;
-    opacity:0.65;
-    margin-top:1px;
-  }
-
-  .btn-enviar{
-    background:var(--oro);
-    color:var(--azul);
-    border:none;
-    border-radius:12px;
-    padding:12px 18px;
-    font-size:14px;
-    font-weight:800;
-    cursor:pointer;
-    white-space:nowrap;
-    transition:opacity 0.15s, transform 0.1s;
-    letter-spacing:0.2px;
-  }
-
-  .btn-enviar:active{
-    opacity:0.85;
-    transform:scale(0.97);
-  }
-
-  .btn-enviar:disabled{
-    opacity:0.6;
-    cursor:not-allowed;
-    transform:none;
-  }
-
-  .modal-overlay{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,0,0,0.5);
-    z-index:300;
-    align-items:flex-end;
-  }
-
-  .modal-overlay.open{
-    display:flex;
-  }
-
-  .modal{
-    background:var(--white);
-    border-radius:20px 20px 0 0;
-    padding:20px 16px 28px;
-    width:100%;
-    max-height:85vh;
-    overflow-y:auto;
-  }
-
-  .modal-strip{
-    width:36px;
-    height:4px;
-    background:#ddd;
-    border-radius:2px;
-    margin:0 auto 16px;
-  }
-
-  .modal-icon{
-    text-align:center;
-    font-size:34px;
-    margin-bottom:8px;
-  }
-
-  .modal h2{
-    text-align:center;
-    font-size:18px;
-    color:var(--azul);
-    margin-bottom:6px;
-    font-weight:700;
-  }
-
-  .modal .modal-fecha{
-    text-align:center;
-    font-size:13px;
-    color:#666;
-    margin-bottom:16px;
-  }
-
-  .modal-detalle{
-    background:#f5f8ff;
-    border-radius:12px;
-    padding:12px;
-    margin-bottom:18px;
-    max-height:220px;
-    overflow-y:auto;
-  }
-
-  .modal-linea{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    font-size:13px;
-    padding:5px 0;
-    border-bottom:1px solid #e8eef8;
-  }
-
-  .modal-linea:last-child{
-    border-bottom:none;
-  }
-
-  .modal-linea .m-prod{
-    color:#1a1a2e;
-    flex:1;
-  }
-
-  .modal-linea .m-cant{
-    font-weight:700;
-    color:var(--azul);
-    background:#e8eef8;
-    padding:2px 8px;
-    border-radius:20px;
-    font-size:12px;
-  }
-
-  .btn-confirmar{
-    width:100%;
-    background:var(--azul);
-    color:var(--white);
-    border:none;
-    border-radius:12px;
-    padding:14px;
-    font-size:15px;
-    font-weight:700;
-    cursor:pointer;
-    margin-bottom:10px;
-  }
-
-  .btn-confirmar:disabled{
-    opacity:0.6;
-    cursor:not-allowed;
-  }
-
-  .btn-cancelar{
-    width:100%;
-    background:none;
-    border:1.5px solid #dde3f0;
-    border-radius:12px;
-    padding:12px;
-    font-size:14px;
-    color:#888;
-    cursor:pointer;
-  }
-
-  .success-screen{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:var(--azul);
-    z-index:400;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:32px;
-    text-align:center;
-  }
-
-  .success-screen.open{
-    display:flex;
-  }
-
-  .success-screen .s-logo{
-    height:60px;
-    margin-bottom:24px;
-    opacity:0.9;
-    display:none;
-  }
-
-  .success-screen .s-check{
-    font-size:56px;
-    margin-bottom:16px;
-  }
-
-  .success-screen h2{
-    color:var(--white);
-    font-size:22px;
-    margin-bottom:10px;
-  }
-
-  .success-screen p{
-    color:rgba(255,255,255,0.75);
-    font-size:14px;
-    line-height:1.7;
-    margin-bottom:32px;
-  }
-
-  .success-screen .s-oro{
-    color:var(--oro);
-    font-weight:700;
-  }
-
-  .btn-nuevo{
-    background:var(--oro);
-    color:var(--azul);
-    border:none;
-    border-radius:12px;
-    padding:15px 32px;
-    font-size:15px;
-    font-weight:800;
-    cursor:pointer;
-  }
-
-  .sending-screen{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(0,32,92,0.94);
-    z-index:350;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:32px;
-    text-align:center;
-  }
-
-  .sending-screen.open{
-    display:flex;
-  }
-
-  .spinner{
-    width:54px;
-    height:54px;
-    border:4px solid rgba(255,255,255,0.25);
-    border-top-color:var(--oro);
-    border-radius:50%;
-    animation:girar 0.9s linear infinite;
-    margin-bottom:18px;
-  }
-
-  .sending-screen h3{
-    color:#fff;
-    font-size:20px;
-    margin-bottom:8px;
-  }
-
-  .sending-screen p{
-    color:rgba(255,255,255,0.75);
-    font-size:14px;
-    line-height:1.5;
-  }
-
-  @keyframes girar{
-    to{transform:rotate(360deg);}
-  }
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:#1a1a2e;min-height:100vh;padding-bottom:95px;}
+  header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,32,92,0.35);}
+  .header-logo{display:flex;justify-content:center;padding:10px 16px 0;}
+  .header-logo img{height:52px;width:auto;object-fit:contain;display:none;}
+  .header-cliente{background:rgba(0,0,0,0.2);padding:8px 14px;display:flex;align-items:center;gap:8px;}
+  .cliente-nombre{font-size:13px;font-weight:700;color:var(--white);}
+  .cliente-sub{font-size:10px;color:rgba(255,255,255,0.65);margin-top:1px;}
+  .oro-dot{width:8px;height:8px;background:var(--oro);border-radius:50%;flex-shrink:0;}
+  .fecha-wrap{padding:8px 14px 10px;background:var(--azul);}
+  .fecha-label{font-size:11px;color:rgba(255,255,255,0.6);margin-bottom:5px;letter-spacing:0.3px;}
+  .fecha-input{width:100%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:9px 12px;color:var(--white);font-size:12px;-webkit-appearance:none;appearance:none;color-scheme:dark;}
+  .domingo-wrap{margin-top:8px;background:rgba(201,168,76,0.15);border:1px solid rgba(201,168,76,0.4);border-radius:10px;padding:10px 12px;display:none;}
+  .domingo-wrap.show{display:flex;align-items:center;gap:10px;}
+  .domingo-wrap label{font-size:12px;color:var(--oro);flex:1;line-height:1.4;}
+  .domingo-toggle{width:44px;height:26px;background:rgba(255,255,255,0.2);border-radius:13px;position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s;}
+  .domingo-toggle.on{background:var(--oro);}
+  .domingo-toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.2s;}
+  .domingo-toggle.on::after{transform:translateX(18px);}
+  .resumen-top{background:var(--azul2);padding:6px 12px;display:flex;align-items:center;gap:8px;}
+  .resumen-top .r-item{flex:1;text-align:center;}
+  .resumen-top .r-val{font-size:15px;font-weight:700;color:var(--white);}
+  .resumen-top .r-lbl{font-size:9px;color:rgba(255,255,255,0.7);}
+  .resumen-top .divider{width:1px;height:24px;background:rgba(255,255,255,0.2);}
+  .container{padding:10px;}
+  .section-card{background:var(--white);border-radius:12px;margin-bottom:10px;overflow:hidden;box-shadow:var(--shadow);}
+  .section-header{background:var(--azul);color:var(--white);padding:9px 14px;font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;}
+  .section-header .badge{background:var(--oro);color:var(--azul);border-radius:20px;padding:2px 9px;font-size:11px;font-weight:700;min-width:24px;text-align:center;}
+  .product-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #f0f2f8;gap:10px;transition:background 0.15s;}
+  .product-row:last-child{border-bottom:none;}
+  .product-row.active{background:#f0f4ff;}
+  .product-name{font-size:13px;color:#1a1a2e;flex:1;line-height:1.3;}
+  .product-row.active .product-name{color:var(--azul);font-weight:600;}
+  .qty-control{display:flex;align-items:center;flex-shrink:0;}
+  .qty-btn{width:30px;height:30px;border:1.5px solid var(--azul2);background:var(--white);color:var(--azul2);font-size:18px;font-weight:300;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none;transition:background 0.12s,opacity 0.12s;}
+  .qty-btn:first-child{border-radius:10px 0 0 10px;}
+  .qty-btn:last-child{border-radius:0 10px 10px 0;}
+  .qty-btn:active{background:#e8eef8;}
+  .qty-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .qty-input{width:38px;height:30px;border:1.5px solid var(--azul2);border-left:none;border-right:none;text-align:center;font-size:14px;font-weight:700;color:var(--azul);background:var(--white);-moz-appearance:textfield;}
+  .qty-input::-webkit-inner-spin-button,.qty-input::-webkit-outer-spin-button{-webkit-appearance:none;}
+  .qty-input:focus{outline:none;background:#f0f4ff;}
+  .qty-input:disabled{opacity:0.7;}
+  .notas-card{background:var(--white);border-radius:12px;margin-bottom:10px;padding:14px;box-shadow:var(--shadow);}
+  .notas-card label{font-size:12px;font-weight:700;color:var(--azul);display:block;margin-bottom:8px;letter-spacing:0.4px;text-transform:uppercase;}
+  .notas-card textarea{width:100%;border:1.5px solid #dde3f0;border-radius:10px;padding:10px 12px;font-size:13px;color:#1a1a2e;resize:none;height:64px;font-family:inherit;}
+  .notas-card textarea:focus{outline:none;border-color:var(--azul2);}
+  .leyenda{border-left:3px solid var(--oro);background:#fffbf0;border-radius:0 10px 10px 0;padding:10px 12px;font-size:12px;color:#5a4a00;margin-bottom:14px;line-height:1.6;}
+  .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:2000;min-width:240px;max-width:90vw;background:#1a1a2e;color:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.25);font-size:14px;display:none;}
+  .toast.show{display:block;}
+  .toast.error{background:var(--error);}
+  .toast.ok{background:var(--ok);}
+  .bottom-bar{position:fixed;bottom:0;left:0;right:0;background:var(--azul);padding:8px 12px 12px;display:flex;align-items:center;gap:12px;box-shadow:0 -2px 12px rgba(0,32,92,0.25);z-index:200;}
+  .bottom-info{flex:1;color:var(--white);}
+  .bottom-info .b-total{font-size:17px;font-weight:700;}
+  .bottom-info .b-sub{font-size:10px;opacity:0.65;margin-top:1px;}
+  .btn-enviar{background:var(--oro);color:var(--azul);border:none;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:800;cursor:pointer;white-space:nowrap;transition:opacity 0.15s,transform 0.1s;letter-spacing:0.2px;}
+  .btn-enviar:active{opacity:0.85;transform:scale(0.97);}
+  .btn-enviar:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
+
+  /* Modal */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;align-items:flex-end;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--white);border-radius:20px 20px 0 0;padding:20px 16px 28px;width:100%;max-height:85vh;overflow-y:auto;}
+  .modal-strip{width:36px;height:4px;background:#ddd;border-radius:2px;margin:0 auto 16px;}
+  .modal-icon{text-align:center;font-size:34px;margin-bottom:8px;}
+  .modal h2{text-align:center;font-size:18px;color:var(--azul);margin-bottom:6px;font-weight:700;}
+  .modal .modal-fecha{text-align:center;font-size:13px;color:#666;margin-bottom:16px;}
+  .modal-detalle{background:#f5f8ff;border-radius:12px;padding:12px;margin-bottom:18px;max-height:220px;overflow-y:auto;}
+  .modal-linea{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:5px 0;border-bottom:1px solid #e8eef8;}
+  .modal-linea:last-child{border-bottom:none;}
+  .modal-linea .m-prod{color:#1a1a2e;flex:1;}
+  .modal-linea .m-cant{font-weight:700;color:var(--azul);background:#e8eef8;padding:2px 8px;border-radius:20px;font-size:12px;}
+  .btn-confirmar{width:100%;background:var(--azul);color:var(--white);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+  .btn-confirmar:disabled{opacity:0.6;cursor:not-allowed;}
+  .btn-cancelar{width:100%;background:none;border:1.5px solid #dde3f0;border-radius:12px;padding:12px;font-size:14px;color:#888;cursor:pointer;}
+
+  /* Pantalla enviando */
+  .sending-screen{display:none;position:fixed;inset:0;background:rgba(0,32,92,0.94);z-index:450;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+  .sending-screen.open{display:flex;}
+  .spinner{width:54px;height:54px;border:4px solid rgba(255,255,255,0.25);border-top-color:var(--oro);border-radius:50%;animation:girar 0.9s linear infinite;margin-bottom:18px;}
+  .sending-screen h3{color:#fff;font-size:20px;margin-bottom:8px;}
+  .sending-screen p{color:rgba(255,255,255,0.75);font-size:14px;line-height:1.5;}
+
+  /* Pantalla éxito */
+  .success-screen{display:none;position:fixed;inset:0;background:var(--azul);z-index:500;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+  .success-screen.open{display:flex;}
+  .success-screen .s-check{font-size:56px;margin-bottom:16px;}
+  .success-screen h2{color:var(--white);font-size:22px;margin-bottom:10px;}
+  .success-screen p{color:rgba(255,255,255,0.75);font-size:14px;line-height:1.7;margin-bottom:32px;}
+  .success-screen .s-oro{color:var(--oro);font-weight:700;}
+  .btn-nuevo{background:var(--oro);color:var(--azul);border:none;border-radius:12px;padding:15px 32px;font-size:15px;font-weight:800;cursor:pointer;}
+
+  @keyframes girar{to{transform:rotate(360deg);}}
 
   @media(min-width:640px){
     body{background:#e8ecf4;}
@@ -698,20 +146,11 @@
 </header>
 
 <div class="resumen-top">
-  <div class="r-item">
-    <div class="r-val" id="rTotal">0</div>
-    <div class="r-lbl">Unidades</div>
-  </div>
+  <div class="r-item"><div class="r-val" id="rTotal">0</div><div class="r-lbl">Unidades</div></div>
   <div class="divider"></div>
-  <div class="r-item">
-    <div class="r-val" id="rProductos">0</div>
-    <div class="r-lbl">Productos</div>
-  </div>
+  <div class="r-item"><div class="r-val" id="rProductos">0</div><div class="r-lbl">Productos</div></div>
   <div class="divider"></div>
-  <div class="r-item">
-    <div class="r-val" id="rFamilias">0</div>
-    <div class="r-lbl">Familias</div>
-  </div>
+  <div class="r-item"><div class="r-val" id="rFamilias">0</div><div class="r-lbl">Familias</div></div>
 </div>
 
 <div class="container" id="mainContainer"></div>
@@ -724,6 +163,7 @@
   <button class="btn-enviar" id="btnEnviar" onclick="abrirModal()">Enviar pedido</button>
 </div>
 
+<!-- MODAL CONFIRMACIÓN -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <div class="modal-strip"></div>
@@ -736,23 +176,24 @@
   </div>
 </div>
 
+<!-- PANTALLA ENVIANDO -->
 <div class="sending-screen" id="sendingScreen">
   <div class="spinner"></div>
   <h3>Enviando pedido…</h3>
   <p>Estamos registrando tu pedido en el sistema.</p>
 </div>
 
+<!-- PANTALLA ÉXITO -->
 <div class="success-screen" id="successScreen">
-  <img class="s-logo" id="successLogo" src="" alt="Logo">
   <div class="s-check">✅</div>
   <h2>¡Pedido enviado!</h2>
-  <p id="successMsg">Tu pedido ha sido registrado.<br>Lo recibirás <span class="s-oro" id="successFecha"></span>.</p>
+  <p>Tu pedido ha sido registrado.<br>Lo recibirás <span class="s-oro" id="successFecha"></span>.</p>
   <button class="btn-nuevo" onclick="nuevoPedido()">Hacer otro pedido</button>
 </div>
 
 <script>
+// ── Configuración ──────────────────────────────────────────
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGYLahIhYRcXaf0nvOqVO_lR-QmcUX1qRq5ArD_o-bJICMlZ9aquo_lRTE8qCVz5Uw/exec';
-const LOGO_B64 = '';
 
 const FAMILIAS = {
   'Bollos':['Bollo Grande','Bollo Grande Picado','Bollo de Pellizco','Bollo Mediano','Bollo Mediano Liado','Bollo Chico','Bollo Chico Liado','Bollo 1/2 Kg','Bollo 1 Kg','Bollo Mini Hostelería','Bollo Mini Hostelería Liado'],
@@ -763,93 +204,82 @@ const FAMILIAS = {
   'Especiales':['Brioche Molde','Burguer 150','Burguer 115','Burguer Cerveza','Chatocao 125']
 };
 
-let cliente = '';
+// ── Estado global ──────────────────────────────────────────
+let cliente   = '';
 let cantidades = {};
 let esDomingo = false;
-let enviando = false;
+let enviando  = false;
 let toastTimer = null;
 
-function init(){
+// ── Gestión de pantallas ───────────────────────────────────
+// Cierra TODAS las capas superpuestas antes de abrir la pedida
+function cerrarTodo() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.getElementById('sendingScreen').classList.remove('open');
+  document.getElementById('successScreen').classList.remove('open');
+}
+
+// ── Toast ──────────────────────────────────────────────────
+function mostrarToast(msg, tipo) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (tipo || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+// ── Init ───────────────────────────────────────────────────
+function init() {
   const params = new URLSearchParams(window.location.search);
-  cliente = (params.get('cliente') || 'Cliente').trim();
-
-  if (LOGO_B64) {
-    document.getElementById('logoImg').src = 'data:image/png;base64,' + LOGO_B64;
-    document.getElementById('logoImg').style.display = 'block';
-    document.getElementById('successLogo').src = 'data:image/png;base64,' + LOGO_B64;
-    document.getElementById('successLogo').style.display = 'block';
-  }
-
+  cliente = (params.get('cliente') || '').trim();
   document.getElementById('nombreCliente').textContent = cliente || 'Cliente';
   generarFechas();
   generarFormulario();
   actualizarResumen();
 }
 
-function mostrarToast(msg, tipo = ''){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show ' + tipo;
-
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => {
-    t.className = 'toast';
-  }, 3000);
-}
-
-function generarFechas(){
+// ── Fechas ─────────────────────────────────────────────────
+function generarFechas() {
   const inp = document.getElementById('fechaEntrega');
-  const hoy = new Date();
-  const man = new Date(hoy);
-  man.setDate(hoy.getDate() + 1);
-
+  const man = new Date();
+  man.setDate(man.getDate() + 1);
   const fmt = d => d.toISOString().split('T')[0];
-
-  inp.min = fmt(man);
+  inp.min   = fmt(man);
   inp.value = fmt(man);
   actualizarBloqueDomingo();
-
   inp.addEventListener('change', () => {
     const sel = new Date(inp.value + 'T12:00:00');
-
     if (sel.getDay() === 0) {
       sel.setDate(sel.getDate() + 1);
       inp.value = fmt(sel);
       mostrarToast('Los domingos no hay reparto. Se ha movido al lunes.', 'error');
     }
-
     actualizarBloqueDomingo();
   });
 }
 
-function actualizarBloqueDomingo(){
-  const inp = document.getElementById('fechaEntrega');
-  const sel = new Date(inp.value + 'T12:00:00');
-  const esSabado = sel.getDay() === 6;
-
-  document.getElementById('domingoWrap').classList.toggle('show', esSabado);
-
-  if (!esSabado) {
+function actualizarBloqueDomingo() {
+  const inp    = document.getElementById('fechaEntrega');
+  const esSab  = new Date(inp.value + 'T12:00:00').getDay() === 6;
+  document.getElementById('domingoWrap').classList.toggle('show', esSab);
+  if (!esSab) {
     esDomingo = false;
     document.getElementById('domingoToggle').classList.remove('on');
   }
 }
 
-function toggleDomingo(){
+function toggleDomingo() {
   if (enviando) return;
-
-  const inp = document.getElementById('fechaEntrega');
-  const sel = new Date(inp.value + 'T12:00:00');
-  if (sel.getDay() !== 6) return;
-
+  if (new Date(document.getElementById('fechaEntrega').value + 'T12:00:00').getDay() !== 6) return;
   esDomingo = !esDomingo;
   document.getElementById('domingoToggle').classList.toggle('on', esDomingo);
 }
 
-function generarFormulario(){
+// ── Formulario ─────────────────────────────────────────────
+function generarFormulario() {
   const c = document.getElementById('mainContainer');
   c.innerHTML = '';
-  cantidades = {};
+  cantidades  = {};
 
   for (const [fam, prods] of Object.entries(FAMILIAS)) {
     const card = document.createElement('div');
@@ -864,7 +294,6 @@ function generarFormulario(){
       cantidades[p] = 0;
       card.appendChild(crearFila(p, fam));
     }
-
     c.appendChild(card);
   }
 
@@ -879,7 +308,7 @@ function generarFormulario(){
   c.appendChild(ley);
 }
 
-function crearFila(prod, fam){
+function crearFila(prod, fam) {
   const row = document.createElement('div');
   row.className = 'product-row';
 
@@ -890,25 +319,18 @@ function crearFila(prod, fam){
   const ctrl = document.createElement('div');
   ctrl.className = 'qty-control';
 
-  const bm = document.createElement('button');
-  bm.className = 'qty-btn';
-  bm.type = 'button';
-  bm.textContent = '−';
+  const bm  = document.createElement('button');
+  bm.className = 'qty-btn'; bm.type = 'button'; bm.textContent = '−';
 
   const inp = document.createElement('input');
-  inp.type = 'number';
-  inp.className = 'qty-input';
-  inp.value = 0;
-  inp.min = 0;
-  inp.inputMode = 'numeric';
+  inp.type = 'number'; inp.className = 'qty-input';
+  inp.value = 0; inp.min = 0; inp.inputMode = 'numeric';
 
-  const bp = document.createElement('button');
-  bp.className = 'qty-btn';
-  bp.type = 'button';
-  bp.textContent = '+';
+  const bp  = document.createElement('button');
+  bp.className = 'qty-btn'; bp.type = 'button'; bp.textContent = '+';
 
   bm.onclick = () => cambiar(prod, fam, -1, row, inp);
-  bp.onclick = () => cambiar(prod, fam, 1, row, inp);
+  bp.onclick = () => cambiar(prod, fam,  1, row, inp);
 
   inp.onchange = () => {
     const v = Math.max(0, parseInt(inp.value, 10) || 0);
@@ -919,19 +341,13 @@ function crearFila(prod, fam){
     actualizarResumen();
   };
 
-  ctrl.appendChild(bm);
-  ctrl.appendChild(inp);
-  ctrl.appendChild(bp);
-
-  row.appendChild(nm);
-  row.appendChild(ctrl);
-
+  ctrl.appendChild(bm); ctrl.appendChild(inp); ctrl.appendChild(bp);
+  row.appendChild(nm);  row.appendChild(ctrl);
   return row;
 }
 
-function cambiar(prod, fam, delta, row, inp){
+function cambiar(prod, fam, delta, row, inp) {
   if (enviando) return;
-
   const v = Math.max(0, (cantidades[prod] || 0) + delta);
   cantidades[prod] = v;
   inp.value = v;
@@ -940,128 +356,77 @@ function cambiar(prod, fam, delta, row, inp){
   actualizarResumen();
 }
 
-function actualizarBadge(fam){
+function actualizarBadge(fam) {
   const total = FAMILIAS[fam].reduce((s, p) => s + (cantidades[p] || 0), 0);
   const b = document.getElementById('badge-' + slugify(fam));
   if (b) b.textContent = total;
 }
 
-function actualizarResumen(){
-  const lineas = obtenerLineasPedido();
+function actualizarResumen() {
+  const lineas   = obtenerLineasPedido();
   const totalUds = lineas.reduce((s, [, v]) => s + v, 0);
-
   const fams = new Set(
     lineas.map(([p]) => {
-      for (const [f, ps] of Object.entries(FAMILIAS)) {
-        if (ps.includes(p)) return f;
-      }
+      for (const [f, ps] of Object.entries(FAMILIAS)) { if (ps.includes(p)) return f; }
       return '';
     }).filter(Boolean)
   ).size;
-
-  document.getElementById('rTotal').textContent = totalUds;
+  document.getElementById('rTotal').textContent    = totalUds;
   document.getElementById('rProductos').textContent = lineas.length;
-  document.getElementById('rFamilias').textContent = fams;
-  document.getElementById('bTotal').textContent = totalUds + ' uds';
-  document.getElementById('bSub').textContent =
-    lineas.length > 0
-      ? lineas.length + ' producto' + (lineas.length > 1 ? 's' : '')
-      : 'Sin productos seleccionados';
+  document.getElementById('rFamilias').textContent  = fams;
+  document.getElementById('bTotal').textContent     = totalUds + ' uds';
+  document.getElementById('bSub').textContent       =
+    lineas.length > 0 ? lineas.length + ' producto' + (lineas.length > 1 ? 's' : '') : 'Sin productos seleccionados';
 }
 
-function formatearFechaEntrega(){
+function formatearFechaEntrega() {
   const fechaRaw = document.getElementById('fechaEntrega').value;
   if (!fechaRaw) return '';
-
   const [y, m, d] = fechaRaw.split('-');
   const ds = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
   const ms = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-
-  const fechaObj = new Date(fechaRaw + 'T12:00:00');
-  const fechaFmt = ds[fechaObj.getDay()] + ' ' + parseInt(d, 10) + ' de ' + ms[parseInt(m, 10) - 1] + ' ' + y;
-
-  return esDomingo ? 'Pan domingo — entrega ' + fechaFmt : fechaFmt;
+  const obj = new Date(fechaRaw + 'T12:00:00');
+  const fmt = ds[obj.getDay()] + ' ' + parseInt(d,10) + ' de ' + ms[parseInt(m,10)-1] + ' ' + y;
+  return esDomingo ? 'Pan domingo — entrega ' + fmt : fmt;
 }
 
-function obtenerLineasPedido(){
+function obtenerLineasPedido() {
   return Object.entries(cantidades).filter(([, v]) => v > 0);
 }
 
-function abrirModal(){
+// ── Modal ──────────────────────────────────────────────────
+function abrirModal() {
   if (enviando) return;
-
-  if (!cliente) {
-    mostrarToast('No se ha detectado el cliente en el enlace.', 'error');
-    return;
-  }
-
+  if (!cliente) { mostrarToast('No se ha detectado el cliente en el enlace.', 'error'); return; }
   const lineas = obtenerLineasPedido();
-  if (!lineas.length) {
-    mostrarToast('Añade al menos un producto antes de enviar.', 'error');
-    return;
-  }
-
+  if (!lineas.length) { mostrarToast('Añade al menos un producto antes de enviar.', 'error'); return; }
   const fecha = formatearFechaEntrega();
-  if (!fecha) {
-    mostrarToast('Selecciona una fecha de entrega válida.', 'error');
-    return;
-  }
+  if (!fecha) { mostrarToast('Selecciona una fecha de entrega válida.', 'error'); return; }
 
-  document.getElementById('modalFecha').textContent = 'Entrega: ' + fecha;
-  document.getElementById('modalDetalle').innerHTML = lineas.map(([p, v]) =>
-    '<div class="modal-linea"><span class="m-prod">' + escaparHtml(p) + '</span><span class="m-cant">' + v + ' uds</span></div>'
+  document.getElementById('modalFecha').textContent   = 'Entrega: ' + fecha;
+  document.getElementById('modalDetalle').innerHTML   = lineas.map(([p, v]) =>
+    '<div class="modal-linea"><span class="m-prod">' + escaparHtml(p) +
+    '</span><span class="m-cant">' + v + ' uds</span></div>'
   ).join('');
 
+  cerrarTodo(); // asegurarse de que no hay nada abierto
   document.getElementById('modalOverlay').classList.add('open');
 }
 
-function cerrarModal(){
-  if (enviando) return;
+function cerrarModal() {
   document.getElementById('modalOverlay').classList.remove('open');
 }
 
-function setEstadoEnvio(activo){
-  enviando = activo;
-
-  document.getElementById('btnEnviar').disabled = activo;
-  document.getElementById('btnConfirmar').disabled = activo;
-  document.getElementById('btnCancelar').disabled = activo;
-  document.getElementById('sendingScreen').classList.toggle('open', activo);
-
-  document.querySelectorAll('.qty-btn').forEach(el => el.disabled = activo);
-  document.querySelectorAll('.qty-input').forEach(el => el.disabled = activo);
-
-  const fechaInput = document.getElementById('fechaEntrega');
-  const notas = document.getElementById('notas');
-
-  if (fechaInput) fechaInput.disabled = activo;
-  if (notas) notas.disabled = activo;
-
-  document.getElementById('btnConfirmar').textContent = activo ? 'Enviando...' : 'Confirmar y enviar';
-}
-
-async function enviarPedido(){
+// ── Envío ──────────────────────────────────────────────────
+async function enviarPedido() {
   if (enviando) return;
 
-  if (!cliente) {
-    mostrarToast('No se ha detectado el cliente en el enlace.', 'error');
-    return;
-  }
-
   const lineas = obtenerLineasPedido();
-  if (!lineas.length) {
-    mostrarToast('Añade al menos un producto antes de enviar.', 'error');
-    return;
-  }
-
+  if (!lineas.length) { mostrarToast('Añade al menos un producto antes de enviar.', 'error'); return; }
   const fecha = formatearFechaEntrega();
-  if (!fecha) {
-    mostrarToast('Selecciona una fecha de entrega válida.', 'error');
-    return;
-  }
+  if (!fecha)  { mostrarToast('Selecciona una fecha de entrega válida.', 'error'); return; }
 
-  const notas = (document.getElementById('notas')?.value || '').trim();
-
+  const notas   = (document.getElementById('notas')?.value || '').trim();
   const payload = {
     cliente,
     fecha,
@@ -1069,35 +434,50 @@ async function enviarPedido(){
     productos: lineas.map(([producto, cantidad]) => ({ producto, cantidad }))
   };
 
-  try {
-    setEstadoEnvio(true);
+  // Bloquear UI
+  enviando = true;
+  document.getElementById('btnEnviar').disabled = true;
+  document.querySelectorAll('.qty-btn, .qty-input').forEach(el => el.disabled = true);
 
+  // 1. Cerrar modal → mostrar enviando
+  cerrarTodo();
+  document.getElementById('sendingScreen').classList.add('open');
+
+  try {
     await fetch(SCRIPT_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload),
-      mode:'no-cors'
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+      mode:    'no-cors'
     });
 
-    cerrarModal();
+    // 2. Éxito: ocultar enviando → mostrar pantalla éxito
+    cerrarTodo();
     document.getElementById('successFecha').textContent = fecha;
     document.getElementById('successScreen').classList.add('open');
-    mostrarToast('Pedido enviado correctamente.', 'ok');
 
   } catch (err) {
-    console.error(err);
+    console.error('Error al enviar pedido:', err);
+    cerrarTodo();
     mostrarToast('No se pudo enviar el pedido. Revisa la conexión e inténtalo de nuevo.', 'error');
   } finally {
-    setEstadoEnvio(false);
+    // Desbloquear UI
+    enviando = false;
+    document.getElementById('btnEnviar').disabled = false;
+    document.querySelectorAll('.qty-btn, .qty-input').forEach(el => el.disabled = false);
   }
 }
 
-function nuevoPedido(){
-  for (const p in cantidades) cantidades[p] = 0;
+// ── Nuevo pedido ───────────────────────────────────────────
+function nuevoPedido() {
+  // 1. Cerrar TODAS las pantallas
+  cerrarTodo();
 
-  document.querySelectorAll('.qty-input').forEach(i => i.value = 0);
+  // 2. Resetear estado
+  for (const p in cantidades) cantidades[p] = 0;
+  document.querySelectorAll('.qty-input').forEach(i  => i.value = 0);
   document.querySelectorAll('.product-row').forEach(r => r.classList.remove('active'));
-  document.querySelectorAll('.badge').forEach(b => b.textContent = '0');
+  document.querySelectorAll('.badge').forEach(b       => b.textContent = '0');
 
   const notas = document.getElementById('notas');
   if (notas) notas.value = '';
@@ -1106,27 +486,19 @@ function nuevoPedido(){
   document.getElementById('domingoToggle').classList.remove('on');
 
   actualizarResumen();
-  document.getElementById('successScreen').classList.remove('open');
   actualizarBloqueDomingo();
-
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function escaparHtml(txt){
+// ── Utils ──────────────────────────────────────────────────
+function escaparHtml(txt) {
   return String(txt)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;');
+    .replaceAll('&', '&amp;').replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }
 
-function slugify(txt){
-  return String(txt)
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/\s+/g, '-')
-    .toLowerCase();
+function slugify(txt) {
+  return String(txt).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').toLowerCase();
 }
 
 init();
