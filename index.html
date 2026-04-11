@@ -14,7 +14,6 @@
   .toast.error{background:var(--error);}
   .toast.ok{background:var(--ok);}
 
-  /* STICKY WRAPPER — header + resumen pegados arriba siempre */
   .sticky-top{position:sticky;top:0;z-index:100;}
   header{background:var(--azul);box-shadow:0 2px 10px rgba(0,32,92,0.35);}
   .header-logo{display:flex;justify-content:center;padding:10px 16px 0;}
@@ -39,9 +38,7 @@
   .resumen-top .r-val{font-size:15px;font-weight:700;color:var(--white);}
   .resumen-top .r-lbl{font-size:9px;color:rgba(255,255,255,0.7);}
   .resumen-top .divider{width:1px;height:24px;background:rgba(255,255,255,0.2);}
-  /* Botón Ver pedido — siempre visible */
-  .btn-ver-pedido{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;color:var(--white);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.15s;}
-  .btn-ver-pedido:active{background:rgba(255,255,255,0.28);}
+  .btn-ver-pedido{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;color:var(--white);cursor:pointer;white-space:nowrap;flex-shrink:0;}
 
   .page-layout{display:block;}
   .main-col{display:block;}
@@ -120,13 +117,35 @@
   .btn-confirmar{width:100%;background:var(--azul);color:var(--white);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;}
   .btn-confirmar:disabled{opacity:0.6;cursor:not-allowed;}
   .btn-cancelar{width:100%;background:none;border:1.5px solid #dde3f0;border-radius:12px;padding:12px;font-size:14px;color:#888;cursor:pointer;}
+  /* FACTURA TOGGLE */
+  .factura-wrap{background:rgba(201,168,76,0.12);border:1.5px solid rgba(201,168,76,0.4);border-radius:12px;padding:10px 14px;margin:10px 0 4px;display:flex;align-items:center;gap:10px;}
+  .factura-wrap label{font-size:12px;color:var(--azul);flex:1;line-height:1.4;}
+  .factura-wrap label strong{color:var(--oro);display:block;font-size:11px;margin-top:1px;}
+  .factura-toggle{width:44px;height:26px;background:#dde3f0;border-radius:13px;position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s;}
+  .factura-toggle.on{background:var(--oro);}
+  .factura-toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+  .factura-toggle.on::after{transform:translateX(18px);}
+
+  /* PANTALLA COUNTDOWN CANCELACIÓN */
+  .cancel-screen{display:none;position:fixed;inset:0;background:var(--azul);z-index:9001;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+  .cancel-screen.open{display:flex;}
+  .cancel-icon{font-size:48px;margin-bottom:12px;}
+  .cancel-screen h2{color:var(--white);font-size:20px;margin-bottom:8px;}
+  .cancel-screen .cancel-sub{color:rgba(255,255,255,0.7);font-size:13px;line-height:1.6;margin-bottom:20px;}
+  .cancel-countdown{font-size:48px;font-weight:900;color:var(--oro);margin:12px 0;font-variant-numeric:tabular-nums;}
+  .cancel-countdown .cc-lbl{font-size:11px;color:rgba(255,255,255,0.5);font-weight:400;}
+  .btn-cancelar-pedido{width:100%;max-width:320px;background:#fff0f0;color:var(--error);border:2px solid #ffd0d0;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;}
+  .btn-cancelar-pedido:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-confirmar-definitivo{width:100%;max-width:320px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;padding:14px;font-size:13px;cursor:pointer;}
+
+  /* SUCCESS con más z-index */
   .sending-screen{display:none;position:fixed;inset:0;background:rgba(0,32,92,0.97);z-index:9000;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
   .sending-screen.open{display:flex;}
   .spinner{width:54px;height:54px;border:4px solid rgba(255,255,255,0.25);border-top-color:var(--oro);border-radius:50%;animation:girar 0.9s linear infinite;margin-bottom:18px;}
   .sending-screen h3{color:#fff;font-size:20px;margin-bottom:8px;}
   .sending-screen p{color:rgba(255,255,255,0.75);font-size:14px;line-height:1.5;}
   @keyframes girar{to{transform:rotate(360deg);}}
-  .success-screen{display:none;position:fixed;inset:0;background:var(--azul);z-index:9001;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+  .success-screen{display:none;position:fixed;inset:0;background:var(--azul);z-index:9002;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
   .success-screen.open{display:flex;}
   .success-screen .s-check{font-size:56px;margin-bottom:16px;}
   .success-screen h2{color:var(--white);font-size:22px;margin-bottom:10px;}
@@ -144,7 +163,6 @@
   @media(min-width:700px){
     body{background:#e0e4ef;padding-bottom:0;}
     .sticky-top{max-width:460px;margin:0 auto;}
-
     .page-layout{display:flex;align-items:flex-start;gap:16px;max-width:800px;margin:0 auto;padding:0 12px;}
     .main-col{flex:1;min-width:0;}
     .banner-habituales{margin:10px 0 0;}
@@ -198,8 +216,7 @@
     </div>
   </div>
 </header>
-
-<div class="resumen-top" id="resumenTop" onclick="abrirCarrito()">
+<div class="resumen-top" onclick="abrirCarrito()">
   <div class="r-item"><div class="r-val" id="rTotal">0</div><div class="r-lbl">Unidades</div></div>
   <div class="divider"></div>
   <div class="r-item"><div class="r-val" id="rProductos">0</div><div class="r-lbl">Productos</div></div>
@@ -260,6 +277,14 @@
     <h2>Confirma tu pedido</h2>
     <div class="modal-fecha" id="modalFecha"></div>
     <div class="modal-detalle" id="modalDetalle"></div>
+    <!-- TOGGLE SOLICITAR FACTURA -->
+    <div class="factura-wrap">
+      <label>
+        Solicitar factura en PDF
+        <strong>Se guardará en Drive y aparecerá en el sistema</strong>
+      </label>
+      <div class="factura-toggle" id="facturaToggle" onclick="toggleFactura()"></div>
+    </div>
     <button class="btn-confirmar" id="btnConfirmar" onclick="enviarPedido()">Confirmar y enviar</button>
     <button class="btn-cancelar" onclick="cerrarModal()">Revisar pedido</button>
   </div>
@@ -278,11 +303,35 @@
   <button class="btn-nuevo" onclick="nuevoPedido()">Hacer otro pedido</button>
 </div>
 
+<!-- PANTALLA COUNTDOWN — cancelar o confirmar -->
+<div class="cancel-screen" id="cancelScreen">
+  <div class="cancel-icon">⏳</div>
+  <h2>Pedido enviado</h2>
+  <div class="cancel-sub">
+    Tienes <strong style="color:var(--oro)">10 minutos</strong> para cancelarlo.<br>
+    Pasado este tiempo quedará confirmado definitivamente.
+  </div>
+  <div class="cancel-countdown">
+    <div id="cdNum">10:00</div>
+    <div class="cc-lbl">tiempo restante</div>
+  </div>
+  <button class="btn-cancelar-pedido" id="btnCancelarPedido" onclick="cancelarPedido()">
+    ✕ Cancelar este pedido
+  </button>
+  <button class="btn-confirmar-definitivo" onclick="confirmarDefinitivo()">
+    Confirmar ahora sin esperar
+  </button>
+  <div id="cancelMsg" style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.6);"></div>
+</div>
+
 <script>
-const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxsAp0sSXdeAUzV_ZddDMO1DxJG5HXhmUWi8SJva8GeNvl_7H0HNyoykBvXWPpVdR0Q/exec';
+const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzGYLahIhYRcXaf0nvOqVO_lR-QmcUX1qRq5ArD_o-bJICMlZ9aquo_lRTE8qCVz5Uw/exec';
 const FAMILIAS={'Bollos':['Bollo Grande','Bollo Grande Picado','Bollo de Pellizco','Bollo Mediano','Bollo Mediano Liado','Bollo Chico','Bollo Chico Liado','Bollo 1/2 Kg','Bollo 1 Kg','Bollo Mini Hostelería','Bollo Mini Hostelería Liado'],'Integrales':['Integral Chico','Integral Grande','Integral Multicereales Chico','Integral Multicereales Grande','Integral Nueces Chico','Integral Nueces Grande','Integral Pipas de Calabaza Chico','Integral Pipas de Calabaza Grande','Integral Chico Cuadrado','Integral Grande Cuadrado'],'Molletes':['Mollete Chico','Mollete Grande','Mollete Extra','Mollete Chico Cuadrado','Mollete Grande Cuadrado','Yeye Barra 350','Yeye Barra','Yeye','Yeye Mini','Mollete Redondo Extra'],'Prieto':['Prieto Chapata Grande','Prieto Pepito Anís','Prieto Pepito Ajonjolí','Prieto Mediano Ajonjolí','Prieto Grande','Prieto Grande Ajonjolí','Prieto Pepito','Prieto Mediano','Prieto Chapata Mediano','Prieto Pepito Mini'],'Panadería':['Pan de Pueblo','Barra Rústica','Baguette','Hallulla 500gr','Hallulla Grande Sabores','Hallulla Grande','Hallulla','Pan de Pueblo 1 Kg','Pan de Pueblo 1,5 Kg','Pan de Aceituna'],'Especiales':['Brioche Molde','Burguer 150','Burguer 115','Burguer Cerveza','Chatocao 125']};
 
 let cliente='',cantidades={},esDomingo=false,enviando=false,toastTimer=null;
+let facturaSolicitada=false;
+let idPedidoActual=null;
+let cdInterval=null;
 
 function getHab(){try{const r=localStorage.getItem('hab_'+cliente);return r?JSON.parse(r):[]}catch(e){return[]}}
 function setHab(l){try{localStorage.setItem('hab_'+cliente,JSON.stringify(l))}catch(e){}}
@@ -482,6 +531,11 @@ function badge(fam){
   if(b)b.textContent=t;
 }
 
+function toggleFactura(){
+  facturaSolicitada=!facturaSolicitada;
+  document.getElementById('facturaToggle').classList.toggle('on',facturaSolicitada);
+}
+
 function actualizarResumen(){
   const lin=lineas();
   const tot=lin.reduce((s,[,v])=>s+v,0);
@@ -496,12 +550,8 @@ function actualizarResumen(){
   document.getElementById('bTotal').textContent=tot+' uds';
   document.getElementById('bSub').textContent=lin.length>0?lin.length+' producto'+(lin.length>1?'s':''):'Sin productos seleccionados';
 
-  // Botón Ver pedido — siempre visible, con contador cuando hay productos
   const btn=document.getElementById('btnVerPedido');
-  if(btn){
-    btn.textContent=tot>0?'🛒 Ver pedido ('+tot+')':'🛒 Ver pedido';
-    btn.style.opacity=tot>0?'1':'0.5';
-  }
+  if(btn){btn.textContent=tot>0?'🛒 Ver pedido ('+tot+')':'🛒 Ver pedido';btn.style.opacity=tot>0?'1':'0.55';}
 }
 
 function actualizarCarrito(){
@@ -570,43 +620,102 @@ function cerrarModal(){
 
 async function enviarPedido(){
   if(enviando)return;
-  const lin=lineas();
-  if(!lin.length)return;
-  const fecha=fmtFecha();
-  if(!fecha)return;
-
+  const lin=lineas();if(!lin.length)return;
+  const fecha=fmtFecha();if(!fecha)return;
   syncHab();
-  enviando=true;
-  bloquearUI(true);
+  enviando=true;bloquearUI(true);
   document.getElementById('modalOverlay').classList.remove('open');
   document.getElementById('sendingScreen').classList.add('open');
-  document.body.style.overflow='hidden'; // bloquear scroll
-
+  document.body.style.overflow='hidden';
   try{
-    await fetch(SCRIPT_URL,{
+    const resp=await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        cliente,
-        fecha,
+        accion:'registrar',
+        cliente,fecha,
         notas:(document.getElementById('notas')?.value||'').trim(),
+        facturaSolicitada,
         productos:lin.map(([producto,cantidad])=>({producto,cantidad}))
       }),
       mode:'no-cors'
     });
-
+    // no-cors devuelve respuesta opaca — asumimos OK y extraemos idPedido del timestamp
+    idPedidoActual='PED-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+
+      new Date().toTimeString().slice(0,8).replace(/:/g,'');
     document.getElementById('sendingScreen').classList.remove('open');
-    document.getElementById('successFecha').textContent=fecha;
-    document.getElementById('successScreen').classList.add('open');
-    // overflow sigue bloqueado — se libera al pulsar "Hacer otro pedido"
-    mostrarBanner();
+    iniciarCountdown(fecha);
   }catch(err){
     document.getElementById('sendingScreen').classList.remove('open');
-    document.body.style.overflow=''; // liberar si hay error
+    document.body.style.overflow='';
     mostrarToast('No se pudo enviar. Revisa la conexión e inténtalo de nuevo.','error');
   }finally{
-    enviando=false;
-    bloquearUI(false);
+    enviando=false;bloquearUI(false);
+  }
+}
+
+// ── COUNTDOWN 10 MINUTOS ────────────────────────────────────
+function iniciarCountdown(fecha){
+  document.getElementById('cancelScreen').classList.add('open');
+  const total=10*60; let restante=total;
+  actualizarDisplay(restante);
+  clearInterval(cdInterval);
+  cdInterval=setInterval(()=>{
+    restante--;
+    actualizarDisplay(restante);
+    if(restante<=0){
+      clearInterval(cdInterval);
+      confirmarDefinitivo(fecha);
+    }
+  },1000);
+  document.getElementById('cancelScreen').dataset.fecha=fecha;
+}
+
+function actualizarDisplay(seg){
+  const m=Math.floor(seg/60); const s=seg%60;
+  document.getElementById('cdNum').textContent=
+    String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  if(seg<=60){
+    document.getElementById('cdNum').style.color='#ff6b6b';
+  }
+}
+
+function confirmarDefinitivo(){
+  clearInterval(cdInterval);
+  const fecha=document.getElementById('cancelScreen').dataset.fecha||'';
+  document.getElementById('cancelScreen').classList.remove('open');
+  document.getElementById('successFecha').textContent=fecha;
+  document.getElementById('successScreen').classList.add('open');
+  mostrarBanner();
+}
+
+async function cancelarPedido(){
+  if(!idPedidoActual)return;
+  const btn=document.getElementById('btnCancelarPedido');
+  btn.disabled=true;btn.textContent='Cancelando...';
+  const msg=document.getElementById('cancelMsg');
+  try{
+    await fetch(SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({accion:'cancelar',idPedido:idPedidoActual}),
+      mode:'no-cors'
+    });
+    clearInterval(cdInterval);
+    document.getElementById('cancelScreen').classList.remove('open');
+    document.body.style.overflow='';
+    // Resetear formulario
+    for(const p in cantidades)cantidades[p]=0;
+    document.querySelectorAll('.qty-input').forEach(i=>i.value=0);
+    document.querySelectorAll('.product-row').forEach(r=>r.classList.remove('active'));
+    document.querySelectorAll('.badge').forEach(b=>b.textContent='0');
+    actualizarResumen();actualizarCarrito();
+    idPedidoActual=null;
+    mostrarToast('Pedido cancelado correctamente.','ok');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }catch(e){
+    btn.disabled=false;btn.textContent='✕ Cancelar este pedido';
+    msg.textContent='Error al cancelar. Llama directamente a la tahona.';
   }
 }
 
@@ -620,19 +729,18 @@ function bloquearUI(b){
 }
 
 function nuevoPedido(){
+  clearInterval(cdInterval);
   document.getElementById('successScreen').classList.remove('open');
-  document.body.style.overflow=''; // liberar scroll
+  document.body.style.overflow='';
   for(const p in cantidades)cantidades[p]=0;
   document.querySelectorAll('.qty-input').forEach(i=>i.value=0);
   document.querySelectorAll('.product-row').forEach(r=>r.classList.remove('active'));
   document.querySelectorAll('.badge').forEach(b=>b.textContent='0');
-  const n=document.getElementById('notas');
-  if(n)n.value='';
-  esDomingo=false;
-  document.getElementById('domingoToggle').classList.remove('on');
-  actualizarResumen();
-  actualizarCarrito();
-  bloqueDomingo();
+  const n=document.getElementById('notas');if(n)n.value='';
+  esDomingo=false;document.getElementById('domingoToggle').classList.remove('on');
+  facturaSolicitada=false;document.getElementById('facturaToggle').classList.remove('on');
+  idPedidoActual=null;
+  actualizarResumen();actualizarCarrito();bloqueDomingo();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
