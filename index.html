@@ -2,19 +2,51 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pedido — Tahona por Salvador Márquez</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
   :root{--azul:#00205C;--azul2:#385CAD;--oro:#C9A84C;--bg:#f4f6fb;--white:#fff;--ok:#25b46b;--error:#d9534f;--shadow:0 1px 4px rgba(0,32,92,0.08);}
   body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:#1a1a2e;min-height:100vh;padding-bottom:95px;}
 
+  /* Evitar zoom en doble tap */
+  button,input,[onclick]{touch-action:manipulation;}
+
+  /* STICKY WRAPPER */
+  .sticky-top{position:sticky;top:0;z-index:100;}
+  header{background:var(--azul);box-shadow:0 2px 10px rgba(0,32,92,0.35);}
+
+  /* FACTURA TOGGLE en modal */
+  .factura-wrap{background:rgba(201,168,76,0.10);border:1.5px solid rgba(201,168,76,0.35);border-radius:12px;padding:10px 14px;margin:10px 0 4px;display:flex;align-items:center;gap:10px;}
+  .factura-wrap label{font-size:12px;color:var(--azul);flex:1;line-height:1.4;cursor:pointer;}
+  .factura-wrap label strong{color:var(--oro);display:block;font-size:10px;margin-top:1px;font-weight:600;}
+  .factura-toggle{width:44px;height:26px;background:#dde3f0;border-radius:13px;position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s;}
+  .factura-toggle.on{background:var(--oro);}
+  .factura-toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
+  .factura-toggle.on::after{transform:translateX(18px);}
+
+  /* COUNTDOWN CANCELACIÓN */
+  .cancel-screen{display:none;position:fixed;inset:0;background:var(--azul);z-index:9010;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+  .cancel-screen.open{display:flex;}
+  .cancel-screen h2{color:var(--white);font-size:20px;margin-bottom:8px;font-weight:700;}
+  .cancel-sub{color:rgba(255,255,255,0.7);font-size:13px;line-height:1.7;margin-bottom:16px;}
+  .cancel-countdown{font-size:56px;font-weight:900;color:var(--oro);margin:8px 0 4px;font-variant-numeric:tabular-nums;line-height:1;}
+  .cc-lbl{font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:20px;}
+  .btn-cancelar-pedido{width:100%;max-width:320px;background:rgba(255,80,80,0.15);color:#ff8a80;border:1.5px solid rgba(255,80,80,0.35);border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;touch-action:manipulation;}
+  .btn-cancelar-pedido:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn-confirmar-ya{width:100%;max-width:320px;background:var(--oro);color:var(--azul);border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:800;cursor:pointer;touch-action:manipulation;}
+  #cancelMsg{margin-top:12px;font-size:12px;color:rgba(255,255,255,0.55);min-height:18px;}
+
+  /* PANTALLA DESCARGA FACTURA en success */
+  .factura-dl{background:rgba(201,168,76,0.15);border:1.5px solid rgba(201,168,76,0.4);border-radius:12px;padding:12px 16px;margin:0 0 20px;width:100%;max-width:320px;}
+  .factura-dl p{color:rgba(255,255,255,0.8);font-size:12px;margin-bottom:8px;}
+  .btn-dl-factura{width:100%;background:var(--oro);color:var(--azul);border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation;}
+
   .toast{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);z-index:2000;min-width:240px;max-width:90vw;background:#1a1a2e;color:#fff;padding:12px 16px;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,0.25);font-size:14px;transition:transform 0.3s ease;}
   .toast.show{transform:translateX(-50%) translateY(0);}
   .toast.error{background:var(--error);}
   .toast.ok{background:var(--ok);}
 
-  .sticky-top{position:sticky;top:0;z-index:100;}
   header{background:var(--azul);box-shadow:0 2px 10px rgba(0,32,92,0.35);}
   .header-logo{display:flex;justify-content:center;padding:10px 16px 0;}
   .header-logo img{height:52px;width:auto;object-fit:contain;display:none;}
@@ -33,12 +65,12 @@
   .domingo-toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.2s;}
   .domingo-toggle.on::after{transform:translateX(18px);}
 
-  .resumen-top{background:var(--azul2);padding:7px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;border-top:1px solid rgba(255,255,255,0.12);}
+  .resumen-top{background:var(--azul2);padding:7px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;border-top:1px solid rgba(255,255,255,0.12);touch-action:manipulation;}
   .resumen-top .r-item{flex:1;text-align:center;}
   .resumen-top .r-val{font-size:15px;font-weight:700;color:var(--white);}
   .resumen-top .r-lbl{font-size:9px;color:rgba(255,255,255,0.7);}
   .resumen-top .divider{width:1px;height:24px;background:rgba(255,255,255,0.2);}
-  .btn-ver-pedido{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;color:var(--white);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+  .btn-ver-pedido{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;color:var(--white);cursor:pointer;white-space:nowrap;flex-shrink:0;touch-action:manipulation;}
 
   .page-layout{display:block;}
   .main-col{display:block;}
@@ -114,55 +146,37 @@
   .modal-linea:last-child{border-bottom:none;}
   .modal-linea .m-prod{color:#1a1a2e;flex:1;}
   .modal-linea .m-cant{font-weight:700;color:var(--azul);background:#e8eef8;padding:2px 8px;border-radius:20px;font-size:12px;}
-  .btn-confirmar{width:100%;background:var(--azul);color:var(--white);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+  .btn-confirmar{width:100%;background:var(--azul);color:var(--white);border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;touch-action:manipulation;}
   .btn-confirmar:disabled{opacity:0.6;cursor:not-allowed;}
-  .btn-cancelar{width:100%;background:none;border:1.5px solid #dde3f0;border-radius:12px;padding:12px;font-size:14px;color:#888;cursor:pointer;}
-  /* FACTURA TOGGLE */
-  .factura-wrap{background:rgba(201,168,76,0.12);border:1.5px solid rgba(201,168,76,0.4);border-radius:12px;padding:10px 14px;margin:10px 0 4px;display:flex;align-items:center;gap:10px;}
-  .factura-wrap label{font-size:12px;color:var(--azul);flex:1;line-height:1.4;}
-  .factura-wrap label strong{color:var(--oro);display:block;font-size:11px;margin-top:1px;}
-  .factura-toggle{width:44px;height:26px;background:#dde3f0;border-radius:13px;position:relative;cursor:pointer;flex-shrink:0;transition:background 0.2s;}
-  .factura-toggle.on{background:var(--oro);}
-  .factura-toggle::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;background:white;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);}
-  .factura-toggle.on::after{transform:translateX(18px);}
-
-  /* PANTALLA COUNTDOWN CANCELACIÓN */
-  .cancel-screen{display:none;position:fixed;inset:0;background:var(--azul);z-index:9001;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
-  .cancel-screen.open{display:flex;}
-  .cancel-icon{font-size:48px;margin-bottom:12px;}
-  .cancel-screen h2{color:var(--white);font-size:20px;margin-bottom:8px;}
-  .cancel-screen .cancel-sub{color:rgba(255,255,255,0.7);font-size:13px;line-height:1.6;margin-bottom:20px;}
-  .cancel-countdown{font-size:48px;font-weight:900;color:var(--oro);margin:12px 0;font-variant-numeric:tabular-nums;}
-  .cancel-countdown .cc-lbl{font-size:11px;color:rgba(255,255,255,0.5);font-weight:400;}
-  .btn-cancelar-pedido{width:100%;max-width:320px;background:#fff0f0;color:var(--error);border:2px solid #ffd0d0;border-radius:12px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:12px;}
-  .btn-cancelar-pedido:disabled{opacity:0.4;cursor:not-allowed;}
-  .btn-confirmar-definitivo{width:100%;max-width:320px;background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);border:1.5px solid rgba(255,255,255,0.25);border-radius:12px;padding:14px;font-size:13px;cursor:pointer;}
-
-  /* SUCCESS con más z-index */
+  .btn-cancelar{width:100%;background:none;border:1.5px solid #dde3f0;border-radius:12px;padding:12px;font-size:14px;color:#888;cursor:pointer;touch-action:manipulation;}
   .sending-screen{display:none;position:fixed;inset:0;background:rgba(0,32,92,0.97);z-index:9000;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
   .sending-screen.open{display:flex;}
   .spinner{width:54px;height:54px;border:4px solid rgba(255,255,255,0.25);border-top-color:var(--oro);border-radius:50%;animation:girar 0.9s linear infinite;margin-bottom:18px;}
   .sending-screen h3{color:#fff;font-size:20px;margin-bottom:8px;}
   .sending-screen p{color:rgba(255,255,255,0.75);font-size:14px;line-height:1.5;}
   @keyframes girar{to{transform:rotate(360deg);}}
-  .success-screen{display:none;position:fixed;inset:0;background:var(--azul);z-index:9002;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+  .success-screen{display:none;position:fixed;inset:0;background:var(--azul);z-index:9005;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;overflow-y:auto;}
   .success-screen.open{display:flex;}
   .success-screen .s-check{font-size:56px;margin-bottom:16px;}
   .success-screen h2{color:var(--white);font-size:22px;margin-bottom:10px;}
-  .success-screen p{color:rgba(255,255,255,0.75);font-size:14px;line-height:1.7;margin-bottom:32px;}
+  .success-screen p{color:rgba(255,255,255,0.75);font-size:14px;line-height:1.7;margin-bottom:20px;}
   .success-screen .s-oro{color:var(--oro);font-weight:700;}
-  .btn-nuevo{background:var(--oro);color:var(--azul);border:none;border-radius:12px;padding:15px 32px;font-size:15px;font-weight:800;cursor:pointer;}
+  .btn-nuevo{background:var(--oro);color:var(--azul);border:none;border-radius:12px;padding:15px 32px;font-size:15px;font-weight:800;cursor:pointer;touch-action:manipulation;}
+  .factura-dl{background:rgba(201,168,76,0.15);border:1.5px solid rgba(201,168,76,0.4);border-radius:12px;padding:12px 16px;margin:0 0 20px;width:100%;max-width:320px;}
+  .factura-dl p{color:rgba(255,255,255,0.8);font-size:12px;margin-bottom:8px;line-height:1.5;}
+  .btn-dl-factura{width:100%;background:var(--oro);color:var(--azul);border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:800;cursor:pointer;touch-action:manipulation;}
 
   .banner-habituales{background:linear-gradient(135deg,#1a3a6b,var(--azul2));margin:10px 10px 0;border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);}
   .banner-habituales .bh-icon{font-size:20px;flex-shrink:0;}
   .banner-habituales .bh-text{flex:1;}
   .banner-habituales .bh-title{font-size:12px;font-weight:700;color:var(--white);margin-bottom:2px;}
   .banner-habituales .bh-sub{font-size:10px;color:rgba(255,255,255,0.65);}
-  .btn-reset-hab{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:5px 10px;font-size:11px;color:rgba(255,255,255,0.85);cursor:pointer;white-space:nowrap;flex-shrink:0;}
+  .btn-ver-todos-hab{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:5px 10px;font-size:11px;color:rgba(255,255,255,0.9);cursor:pointer;white-space:nowrap;flex-shrink:0;touch-action:manipulation;}
 
   @media(min-width:700px){
     body{background:#e0e4ef;padding-bottom:0;}
     .sticky-top{max-width:460px;margin:0 auto;}
+
     .page-layout{display:flex;align-items:flex-start;gap:16px;max-width:800px;margin:0 auto;padding:0 12px;}
     .main-col{flex:1;min-width:0;}
     .banner-habituales{margin:10px 0 0;}
@@ -277,15 +291,14 @@
     <h2>Confirma tu pedido</h2>
     <div class="modal-fecha" id="modalFecha"></div>
     <div class="modal-detalle" id="modalDetalle"></div>
-    <!-- TOGGLE SOLICITAR FACTURA -->
     <div class="factura-wrap">
-      <label>
+      <label onclick="toggleFactura()">
         Solicitar factura en PDF
-        <strong>Se guardará en Drive y aparecerá en el sistema</strong>
+        <strong>📄 Se genera automáticamente al confirmar</strong>
       </label>
       <div class="factura-toggle" id="facturaToggle" onclick="toggleFactura()"></div>
     </div>
-    <button class="btn-confirmar" id="btnConfirmar" onclick="enviarPedido()">Confirmar y enviar</button>
+    <button class="btn-confirmar" id="btnConfirmar" onclick="iniciarCountdown()">Confirmar pedido</button>
     <button class="btn-cancelar" onclick="cerrarModal()">Revisar pedido</button>
   </div>
 </div>
@@ -296,47 +309,436 @@
   <p>Registrando tu pedido en el sistema.</p>
 </div>
 
+<!-- COUNTDOWN — 10 min para cancelar ANTES de enviar -->
+<div class="cancel-screen" id="cancelScreen">
+  <div style="font-size:48px;margin-bottom:12px;">⏳</div>
+  <h2>Pedido listo para enviar</h2>
+  <div class="cancel-sub">
+    Tienes <strong style="color:var(--oro)">10 minutos</strong> para cancelarlo antes de que se registre.<br>
+    Si no cancelas, se enviará automáticamente.
+  </div>
+  <div class="cancel-countdown" id="cdNum">10:00</div>
+  <div class="cc-lbl">tiempo restante para cancelar</div>
+  <button class="btn-cancelar-pedido" id="btnCancelarPedido" onclick="cancelarPedido()">✕ Cancelar — no quiero este pedido</button>
+  <button class="btn-confirmar-ya" onclick="confirmarDefinitivo()">✓ Confirmar ahora sin esperar</button>
+  <div id="cancelMsg"></div>
+</div>
+
 <div class="success-screen" id="successScreen">
   <div class="s-check">✅</div>
   <h2>¡Pedido enviado!</h2>
   <p>Tu pedido ha sido registrado.<br>Lo recibirás <span class="s-oro" id="successFecha"></span>.</p>
+  <div class="factura-dl" id="facturaDlWrap" style="display:none">
+    <p>📄 Tu factura ha sido generada.<br>Pulsa para descargarla en PDF.</p>
+    <button class="btn-dl-factura" onclick="descargarFacturaCliente()">⬇️ Descargar factura en PDF</button>
+  </div>
   <button class="btn-nuevo" onclick="nuevoPedido()">Hacer otro pedido</button>
-</div>
-
-<!-- PANTALLA COUNTDOWN — cancelar o confirmar -->
-<div class="cancel-screen" id="cancelScreen">
-  <div class="cancel-icon">⏳</div>
-  <h2>Pedido enviado</h2>
-  <div class="cancel-sub">
-    Tienes <strong style="color:var(--oro)">10 minutos</strong> para cancelarlo.<br>
-    Pasado este tiempo quedará confirmado definitivamente.
-  </div>
-  <div class="cancel-countdown">
-    <div id="cdNum">10:00</div>
-    <div class="cc-lbl">tiempo restante</div>
-  </div>
-  <button class="btn-cancelar-pedido" id="btnCancelarPedido" onclick="cancelarPedido()">
-    ✕ Cancelar este pedido
-  </button>
-  <button class="btn-confirmar-definitivo" onclick="confirmarDefinitivo()">
-    Confirmar ahora sin esperar
-  </button>
-  <div id="cancelMsg" style="margin-top:16px;font-size:12px;color:rgba(255,255,255,0.6);"></div>
 </div>
 
 <script>
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbzGYLahIhYRcXaf0nvOqVO_lR-QmcUX1qRq5ArD_o-bJICMlZ9aquo_lRTE8qCVz5Uw/exec';
 const FAMILIAS={'Bollos':['Bollo Grande','Bollo Grande Picado','Bollo de Pellizco','Bollo Mediano','Bollo Mediano Liado','Bollo Chico','Bollo Chico Liado','Bollo 1/2 Kg','Bollo 1 Kg','Bollo Mini Hostelería','Bollo Mini Hostelería Liado'],'Integrales':['Integral Chico','Integral Grande','Integral Multicereales Chico','Integral Multicereales Grande','Integral Nueces Chico','Integral Nueces Grande','Integral Pipas de Calabaza Chico','Integral Pipas de Calabaza Grande','Integral Chico Cuadrado','Integral Grande Cuadrado'],'Molletes':['Mollete Chico','Mollete Grande','Mollete Extra','Mollete Chico Cuadrado','Mollete Grande Cuadrado','Yeye Barra 350','Yeye Barra','Yeye','Yeye Mini','Mollete Redondo Extra'],'Prieto':['Prieto Chapata Grande','Prieto Pepito Anís','Prieto Pepito Ajonjolí','Prieto Mediano Ajonjolí','Prieto Grande','Prieto Grande Ajonjolí','Prieto Pepito','Prieto Mediano','Prieto Chapata Mediano','Prieto Pepito Mini'],'Panadería':['Pan de Pueblo','Barra Rústica','Baguette','Hallulla 500gr','Hallulla Grande Sabores','Hallulla Grande','Hallulla','Pan de Pueblo 1 Kg','Pan de Pueblo 1,5 Kg','Pan de Aceituna'],'Especiales':['Brioche Molde','Burguer 150','Burguer 115','Burguer Cerveza','Chatocao 125']};
 
+const IVA={'Bollos':4,'Integrales':4,'Molletes':4,'Prieto':4,'Panadería':4,'Especiales':10,'Pan de Aceituna':10};
+
 let cliente='',cantidades={},esDomingo=false,enviando=false,toastTimer=null;
 let facturaSolicitada=false;
-let idPedidoActual=null;
+let pendingOrder=null;   // pedido guardado pero aún NO enviado
+let lastLineas=[];       // últimas líneas para factura PDF
 let cdInterval=null;
+let mostrarTodosFlag=false; // "Ver todos" sin borrar historial
 
+// ── HABITUALES ──────────────────────────────────────────────
 function getHab(){try{const r=localStorage.getItem('hab_'+cliente);return r?JSON.parse(r):[]}catch(e){return[]}}
 function setHab(l){try{localStorage.setItem('hab_'+cliente,JSON.stringify(l))}catch(e){}}
-function syncHab(){const p=Object.entries(cantidades).filter(([,v])=>v>0).map(([k])=>k);if(p.length)setHab([...new Set([...getHab(),...p])])}
-function resetHab(){try{localStorage.removeItem('hab_'+cliente)}catch(e){}mostrarToast('Historial borrado.','ok');generarFormulario();actualizarResumen();actualizarCarrito();mostrarBanner()}
+function syncHab(){
+  // Guarda el último pedido como habituales
+  const p=Object.entries(cantidades).filter(([,v])=>v>0).map(([k])=>k);
+  if(p.length) setHab([...new Set([...getHab(),...p])]);
+}
+
+// "Ver todos" sin borrar historial — solo muestra todo temporalmente
+function verTodos(){
+  mostrarTodosFlag=!mostrarTodosFlag;
+  generarFormulario();
+  actualizarResumen();actualizarCarrito();mostrarBanner();
+}
+
+// Borrar historial de habituales (acción destructiva, desde settings)
+function resetHab(){
+  try{localStorage.removeItem('hab_'+cliente)}catch(e){}
+  mostrarTodosFlag=false;
+  mostrarToast('Historial borrado. Mostrando todos los productos.','ok');
+  generarFormulario();actualizarResumen();actualizarCarrito();mostrarBanner();
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+function mostrarToast(msg,tipo){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show '+(tipo||'');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>{t.className='toast'},3200);
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+function init(){
+  const p=new URLSearchParams(window.location.search);
+  cliente=(p.get('cliente')||'').trim();
+  document.getElementById('nombreCliente').textContent=cliente||'Sin identificar';
+  if(!cliente)mostrarToast('Usa tu enlace personalizado.','error');
+  generarFechas();generarFormulario();actualizarResumen();actualizarCarrito();mostrarBanner();
+}
+
+// ── FECHAS ───────────────────────────────────────────────────
+function generarFechas(){
+  const inp=document.getElementById('fechaEntrega');
+  const man=new Date();man.setDate(man.getDate()+1);
+  const fmt=d=>d.toISOString().split('T')[0];
+  inp.min=fmt(man);inp.value=fmt(man);bloqueDomingo();
+  inp.addEventListener('change',()=>{
+    const s=new Date(inp.value+'T12:00:00');
+    if(s.getDay()===0){s.setDate(s.getDate()+1);inp.value=fmt(s);mostrarToast('Los domingos no hay reparto. Movido al lunes.','error')}
+    bloqueDomingo();
+  });
+}
+function bloqueDomingo(){
+  const esSab=new Date(document.getElementById('fechaEntrega').value+'T12:00:00').getDay()===6;
+  document.getElementById('domingoWrap').classList.toggle('show',esSab);
+  if(!esSab){esDomingo=false;document.getElementById('domingoToggle').classList.remove('on')}
+}
+function toggleDomingo(){
+  if(enviando)return;
+  if(new Date(document.getElementById('fechaEntrega').value+'T12:00:00').getDay()!==6)return;
+  esDomingo=!esDomingo;document.getElementById('domingoToggle').classList.toggle('on',esDomingo);
+}
+function toggleFactura(){
+  facturaSolicitada=!facturaSolicitada;
+  document.getElementById('facturaToggle').classList.toggle('on',facturaSolicitada);
+}
+
+// ── BANNER HABITUALES ────────────────────────────────────────
+function mostrarBanner(){
+  const hab=getHab();const w=document.getElementById('bannerHabituales');
+  if(!hab.length||!cliente){w.innerHTML='';return}
+  const btnLabel=mostrarTodosFlag?'Ver solo habituales':'Ver todos los productos';
+  w.innerHTML=`<div class="banner-habituales"><div class="bh-icon">⭐</div><div class="bh-text"><div class="bh-title">Tus productos habituales</div><div class="bh-sub">${hab.length} producto${hab.length!==1?'s':''} guardados</div></div><button class="btn-ver-todos-hab" onclick="verTodos()">${btnLabel}</button></div>`;
+}
+
+// ── FORMULARIO ───────────────────────────────────────────────
+function generarFormulario(){
+  const c=document.getElementById('mainContainer');c.innerHTML='';cantidades={};
+  const hab=getHab();
+  // Con mostrarTodosFlag=true mostramos todo pero habituales siguen marcados
+  const tieneHab=hab.length>0&&!!cliente&&!mostrarTodosFlag;
+
+  for(const[fam,prods]of Object.entries(FAMILIAS)){
+    const vis=tieneHab?prods.filter(p=>hab.includes(p)):prods;
+    const ocu=tieneHab?prods.filter(p=>!hab.includes(p)):[];
+    if(tieneHab&&vis.length===0){prods.forEach(p=>cantidades[p]=0);continue}
+
+    const card=document.createElement('div');card.className='section-card';
+    const hdr=document.createElement('div');hdr.className='section-header';
+    hdr.innerHTML=esc(fam)+'<span class="badge" id="badge-'+slug(fam)+'">0</span>';
+    card.appendChild(hdr);
+    vis.forEach(p=>{cantidades[p]=0;card.appendChild(crearFila(p,fam,false))});
+
+    if(ocu.length>0){
+      const btn=document.createElement('div');btn.className='mas-btn';btn.id='mb-'+slug(fam);
+      btn.innerHTML='➕ Más productos de '+esc(fam)+' <span class="flecha">▼</span>';
+      btn.onclick=()=>toggleMas(fam,btn);card.appendChild(btn);
+      ocu.forEach(p=>{cantidades[p]=0;const f=crearFila(p,fam,true);f.dataset.ef=slug(fam);card.appendChild(f)});
+    }
+    c.appendChild(card);
+  }
+  const n=document.createElement('div');n.className='notas-card';
+  n.innerHTML='<label>Notas adicionales</label><textarea id="notas" placeholder="Observaciones, cambios o productos especiales..."></textarea>';
+  c.appendChild(n);
+  const l=document.createElement('div');l.className='leyenda';
+  l.innerHTML='📌 <strong>Recuerda:</strong> los pedidos se entregan al día siguiente. El pan del domingo se suministra el sábado.';
+  c.appendChild(l);
+}
+
+function toggleMas(fam,btn){
+  const ab=btn.classList.toggle('abierto');
+  document.querySelectorAll('[data-ef="'+slug(fam)+'"]').forEach(f=>f.classList.toggle('oculto',!ab));
+}
+
+function crearFila(prod,fam,oculto){
+  const row=document.createElement('div');row.className='product-row'+(oculto?' oculto':'');
+  const nm=document.createElement('div');nm.className='product-name';nm.textContent=prod;
+  const ctrl=document.createElement('div');ctrl.className='qty-control';
+  const bm=document.createElement('button');bm.className='qty-btn';bm.type='button';bm.textContent='−';bm.setAttribute('aria-label','menos');
+  const inp=document.createElement('input');inp.type='number';inp.className='qty-input';inp.value=0;inp.min=0;inp.inputMode='numeric';
+  const bp=document.createElement('button');bp.className='qty-btn';bp.type='button';bp.textContent='+';bp.setAttribute('aria-label','más');
+  bm.onclick=()=>cambiar(prod,fam,-1,row,inp);
+  bp.onclick=()=>cambiar(prod,fam,1,row,inp);
+  inp.onchange=()=>{
+    const v=Math.max(0,parseInt(inp.value,10)||0);
+    inp.value=v;cantidades[prod]=v;row.classList.toggle('active',v>0);
+    badge(fam);actualizarResumen();actualizarCarrito();
+  };
+  ctrl.appendChild(bm);ctrl.appendChild(inp);ctrl.appendChild(bp);
+  row.appendChild(nm);row.appendChild(ctrl);return row;
+}
+
+function cambiar(prod,fam,delta,row,inp){
+  if(enviando)return;
+  const v=Math.max(0,(cantidades[prod]||0)+delta);
+  cantidades[prod]=v;inp.value=v;row.classList.toggle('active',v>0);
+  badge(fam);actualizarResumen();actualizarCarrito();
+}
+
+function badge(fam){
+  const t=(FAMILIAS[fam]||[]).reduce((s,p)=>s+(cantidades[p]||0),0);
+  const b=document.getElementById('badge-'+slug(fam));if(b)b.textContent=t;
+}
+
+function actualizarResumen(){
+  const lin=lineas();
+  const tot=lin.reduce((s,[,v])=>s+v,0);
+  const fams=new Set(lin.map(([p])=>{for(const[f,ps]of Object.entries(FAMILIAS))if(ps.includes(p))return f;return''}).filter(Boolean)).size;
+  document.getElementById('rTotal').textContent=tot;
+  document.getElementById('rProductos').textContent=lin.length;
+  document.getElementById('rFamilias').textContent=fams;
+  document.getElementById('bTotal').textContent=tot+' uds';
+  document.getElementById('bSub').textContent=lin.length>0?lin.length+' producto'+(lin.length>1?'s':''):'Sin productos seleccionados';
+  const btn=document.getElementById('btnVerPedido');
+  if(btn){btn.textContent=tot>0?'🛒 Ver pedido ('+tot+')':'🛒 Ver pedido';btn.style.opacity=tot>0?'1':'0.5';}
+}
+
+// ── CARRITO ──────────────────────────────────────────────────
+function actualizarCarrito(){
+  const lin=lineas();
+  const html=lin.length===0?'<div class="carrito-empty">Aún no has añadido productos</div>'
+    :lin.map(([p,v])=>`<div class="carrito-item"><span class="ci-nombre">${esc(p)}</span><span class="ci-cant">${v} uds</span></div>`).join('');
+  const cl=document.getElementById('carritoLista');if(cl)cl.innerHTML=html;
+  const sl=document.getElementById('sbLista');
+  if(sl){sl.innerHTML=lin.length===0?'<div class="sb-empty">Aún no has añadido<br>ningún producto</div>'
+    :lin.map(([p,v])=>`<div class="sb-item"><span class="sb-nombre">${esc(p)}</span><span class="sb-cant">${v} uds</span></div>`).join('');}
+  const sc=document.getElementById('sbCount');if(sc)sc.textContent=lin.reduce((s,[,v])=>s+v,0)+' uds';
+}
+
+function abrirCarrito(){
+  if(window.innerWidth>=700)return;
+  document.getElementById('carritoDrawer').classList.add('open');
+  document.getElementById('carritoOverlay').classList.add('open');
+}
+function cerrarCarrito(){
+  document.getElementById('carritoDrawer').classList.remove('open');
+  document.getElementById('carritoOverlay').classList.remove('open');
+}
+
+// ── BORRAR ───────────────────────────────────────────────────
+function borrarPedido(){
+  if(enviando)return;
+  if(!lineas().length){mostrarToast('El pedido ya está vacío.','');return}
+  for(const p in cantidades)cantidades[p]=0;
+  document.querySelectorAll('.qty-input').forEach(i=>i.value=0);
+  document.querySelectorAll('.product-row').forEach(r=>r.classList.remove('active'));
+  document.querySelectorAll('.badge').forEach(b=>b.textContent='0');
+  const notas=document.getElementById('notas');if(notas)notas.value='';
+  actualizarResumen();actualizarCarrito();
+  mostrarToast('Pedido borrado. Puedes empezar de nuevo.','ok');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── MODAL ────────────────────────────────────────────────────
+function abrirModal(){
+  if(enviando)return;
+  if(!cliente){mostrarToast('Usa tu enlace personalizado.','error');return}
+  const lin=lineas();
+  if(!lin.length){mostrarToast('Añade al menos un producto antes de enviar.','error');return}
+  const fecha=fmtFecha();if(!fecha){mostrarToast('Selecciona una fecha de entrega válida.','error');return}
+  document.getElementById('modalFecha').textContent='Entrega: '+fecha;
+  document.getElementById('modalDetalle').innerHTML=lin.map(([p,v])=>
+    `<div class="modal-linea"><span class="m-prod">${esc(p)}</span><span class="m-cant">${v} uds</span></div>`
+  ).join('');
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function cerrarModal(){document.getElementById('modalOverlay').classList.remove('open')}
+
+// ── GUARDAR PEDIDO + INICIAR COUNTDOWN (no envía aún) ────────
+function iniciarCountdown(){
+  const lin=lineas();if(!lin.length)return;
+  const fecha=fmtFecha();if(!fecha)return;
+
+  // Guardar pedido pendiente en memoria (aún NO enviado al servidor)
+  pendingOrder={
+    accion:'registrar', cliente, fecha,
+    notas:(document.getElementById('notas')?.value||'').trim(),
+    facturaSolicitada,
+    productos:lin.map(([producto,cantidad])=>({producto,cantidad}))
+  };
+  lastLineas=[...lin]; // guardar para factura PDF
+
+  syncHab(); // actualizar habituales con este pedido
+  cerrarModal();
+  document.getElementById('cancelScreen').classList.add('open');
+  document.body.style.overflow='hidden';
+
+  // Countdown 10 minutos
+  let restante=10*60;
+  actualizarDisplay(restante);
+  clearInterval(cdInterval);
+  cdInterval=setInterval(()=>{
+    restante--;
+    actualizarDisplay(restante);
+    if(restante<=0){clearInterval(cdInterval);confirmarDefinitivo();}
+  },1000);
+}
+
+function actualizarDisplay(seg){
+  const m=Math.floor(seg/60),s=seg%60;
+  document.getElementById('cdNum').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  if(seg<=60) document.getElementById('cdNum').style.color='#ff6b6b';
+  else        document.getElementById('cdNum').style.color='var(--oro)';
+}
+
+// ── CANCELAR — pedido no se ha enviado, solo cerramos ────────
+function cancelarPedido(){
+  clearInterval(cdInterval);
+  pendingOrder=null;lastLineas=[];
+  document.getElementById('cancelScreen').classList.remove('open');
+  document.body.style.overflow='';
+  mostrarToast('Pedido cancelado. Puedes modificarlo y enviarlo de nuevo.','ok');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── CONFIRMAR — ahora SÍ se envía al servidor ────────────────
+async function confirmarDefinitivo(){
+  clearInterval(cdInterval);
+  document.getElementById('cancelScreen').classList.remove('open');
+  if(!pendingOrder){document.body.style.overflow='';return;}
+
+  document.getElementById('sendingScreen').classList.add('open');
+
+  try{
+    await fetch(SCRIPT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(pendingOrder),
+      mode:'no-cors'
+    });
+    document.getElementById('sendingScreen').classList.remove('open');
+    document.getElementById('successFecha').textContent=pendingOrder.fecha;
+
+    // Mostrar botón descarga factura si la solicitó
+    const facWrap=document.getElementById('facturaDlWrap');
+    if(facWrap) facWrap.style.display=pendingOrder.facturaSolicitada?'block':'none';
+
+    document.getElementById('successScreen').classList.add('open');
+    mostrarBanner();
+    pendingOrder=null;
+  }catch(err){
+    document.getElementById('sendingScreen').classList.remove('open');
+    document.body.style.overflow='';
+    mostrarToast('Error al enviar. Revisa tu conexión e inténtalo de nuevo.','error');
+  }
+}
+
+// ── FACTURA PDF EN EL NAVEGADOR ──────────────────────────────
+// Genera una factura descargable para el cliente sin necesitar servidor
+function descargarFacturaCliente(){
+  if(!lastLineas.length){mostrarToast('No hay datos del pedido para generar la factura.','error');return;}
+  const fecha=document.getElementById('successFecha').textContent||'';
+  const hoy=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  let base4=0,base10=0,filas='';
+  const ivaPorFam={Bollos:4,Integrales:4,Molletes:4,Prieto:4,'Panadería':4,Especiales:10};
+
+  // Necesitamos precio — usamos los que teníamos del catálogo... pero no los tenemos en el formulario
+  // Generamos factura sin precio (solo unidades) con nota "Pendiente de valoración"
+  lastLineas.forEach(([prod,cant])=>{
+    filas+=`<tr><td>${esc(prod)}</td><td style="text-align:center">${cant}</td><td style="text-align:center">—</td><td style="text-align:right">—</td></tr>`;
+  });
+  const totalUds=lastLineas.reduce((s,[,v])=>s+v,0);
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Solicitud de Factura</title>
+<style>
+*{margin:0;padding:0;font-family:Arial,sans-serif;font-size:10px;}
+body{padding:20px;}
+.logo{font-size:14px;font-weight:bold;color:#00205C;border-bottom:3px solid #00205C;padding-bottom:8px;margin-bottom:12px;}
+.sub{font-size:9px;color:#666;margin-top:2px;}
+.header{background:#00205C;color:white;padding:8px 12px;margin:10px 0;border-radius:4px;display:flex;justify-content:space-between;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.box{background:#f5f8ff;border:1px solid #dde;border-radius:4px;padding:7px;}
+.box .lbl{font-size:7px;color:#777;text-transform:uppercase;margin-bottom:3px;}
+.box .val{font-size:10px;font-weight:bold;}
+table{width:100%;border-collapse:collapse;}
+th{background:#00205C;color:white;padding:5px;font-size:9px;text-align:left;}
+td{padding:4px;border-bottom:1px solid #eee;}
+.nota{margin-top:12px;font-size:8px;color:#999;border-top:1px solid #ddd;padding-top:6px;}
+@media print{body{padding:10px;}}
+</style></head><body>
+<div class="logo">Grupo Salmarfer SL<div class="sub">Tahona por Salvador Márquez · La Casa del Pan</div></div>
+<div class="header"><div style="font-size:13px;font-weight:bold">SOLICITUD DE FACTURA</div><div>Fecha: ${hoy}</div></div>
+<div class="grid">
+  <div class="box"><div class="lbl">Cliente</div><div class="val">${esc(cliente)}</div></div>
+  <div class="box"><div class="lbl">Entrega</div><div class="val">${esc(fecha)}</div></div>
+</div>
+<table>
+<tr><th>Producto</th><th style="text-align:center">Uds.</th><th style="text-align:center">IVA</th><th style="text-align:right">Importe</th></tr>
+${filas}
+<tr style="background:#00205C;color:white;font-weight:bold">
+  <td colspan="2">TOTAL — ${totalUds} unidades</td><td></td><td style="text-align:right">A calcular</td>
+</tr></table>
+<div class="nota">
+Documento de solicitud de factura. La factura oficial con numeración correlativa y valoración económica<br>
+será emitida por Grupo Salmarfer SL y enviada por el canal acordado.<br>
+IVA 4% superreducido (pan y bollería) · IVA 10% reducido (productos especiales) · RD Ley 20/2022
+</div>
+</body></html>`;
+
+  const win=window.open('','_blank','width=700,height=900');
+  if(win){
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(()=>win.print(),500);
+  } else {
+    mostrarToast('Permite ventanas emergentes para descargar la factura.','error');
+  }
+}
+
+// ── BLOQUEAR UI ──────────────────────────────────────────────
+function bloquearUI(b){
+  ['btnEnviar','btnBorrar'].forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=b});
+  document.querySelectorAll('.qty-btn').forEach(el=>el.disabled=b);
+  document.querySelectorAll('.qty-input').forEach(el=>el.disabled=b);
+}
+
+// ── NUEVO PEDIDO ─────────────────────────────────────────────
+function nuevoPedido(){
+  clearInterval(cdInterval);
+  document.getElementById('successScreen').classList.remove('open');
+  document.body.style.overflow='';
+  for(const p in cantidades)cantidades[p]=0;
+  document.querySelectorAll('.qty-input').forEach(i=>i.value=0);
+  document.querySelectorAll('.product-row').forEach(r=>r.classList.remove('active'));
+  document.querySelectorAll('.badge').forEach(b=>b.textContent='0');
+  const n=document.getElementById('notas');if(n)n.value='';
+  esDomingo=false;document.getElementById('domingoToggle').classList.remove('on');
+  facturaSolicitada=false;document.getElementById('facturaToggle').classList.remove('on');
+  pendingOrder=null;mostrarTodosFlag=false;
+  actualizarResumen();actualizarCarrito();bloqueDomingo();mostrarBanner();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── HELPERS ──────────────────────────────────────────────────
+function fmtFecha(){
+  const r=document.getElementById('fechaEntrega').value;if(!r)return'';
+  const[y,m,d]=r.split('-');
+  const ds=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const ms=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const o=new Date(r+'T12:00:00');
+  const base=ds[o.getDay()]+' '+parseInt(d,10)+' de '+ms[parseInt(m,10)-1]+' '+y;
+  return esDomingo?'Pan domingo — entrega '+base:base;
+}
+function lineas(){return Object.entries(cantidades).filter(([,v])=>v>0)}
+function esc(t){return String(t).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;')}
+function slug(t){return String(t).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'-').toLowerCase()}
+
+init();
+</script>
 
 function mostrarToast(msg,tipo){
   const t=document.getElementById('toast');
@@ -531,11 +933,6 @@ function badge(fam){
   if(b)b.textContent=t;
 }
 
-function toggleFactura(){
-  facturaSolicitada=!facturaSolicitada;
-  document.getElementById('facturaToggle').classList.toggle('on',facturaSolicitada);
-}
-
 function actualizarResumen(){
   const lin=lineas();
   const tot=lin.reduce((s,[,v])=>s+v,0);
@@ -550,8 +947,8 @@ function actualizarResumen(){
   document.getElementById('bTotal').textContent=tot+' uds';
   document.getElementById('bSub').textContent=lin.length>0?lin.length+' producto'+(lin.length>1?'s':''):'Sin productos seleccionados';
 
-  const btn=document.getElementById('btnVerPedido');
-  if(btn){btn.textContent=tot>0?'🛒 Ver pedido ('+tot+')':'🛒 Ver pedido';btn.style.opacity=tot>0?'1':'0.55';}
+  const h=document.getElementById('rHint');
+  if(h)h.textContent=lin.length>0?'Ver pedido ›':'';
 }
 
 function actualizarCarrito(){
@@ -620,102 +1017,40 @@ function cerrarModal(){
 
 async function enviarPedido(){
   if(enviando)return;
-  const lin=lineas();if(!lin.length)return;
-  const fecha=fmtFecha();if(!fecha)return;
+  const lin=lineas();
+  if(!lin.length)return;
+  const fecha=fmtFecha();
+  if(!fecha)return;
+
   syncHab();
-  enviando=true;bloquearUI(true);
+  enviando=true;
+  bloquearUI(true);
   document.getElementById('modalOverlay').classList.remove('open');
   document.getElementById('sendingScreen').classList.add('open');
-  document.body.style.overflow='hidden';
-  try{
-    const resp=await fetch(SCRIPT_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        accion:'registrar',
-        cliente,fecha,
-        notas:(document.getElementById('notas')?.value||'').trim(),
-        facturaSolicitada,
-        productos:lin.map(([producto,cantidad])=>({producto,cantidad}))
-      }),
-      mode:'no-cors'
-    });
-    // no-cors devuelve respuesta opaca — asumimos OK y extraemos idPedido del timestamp
-    idPedidoActual='PED-'+new Date().toISOString().slice(0,10).replace(/-/g,'')+'-'+
-      new Date().toTimeString().slice(0,8).replace(/:/g,'');
-    document.getElementById('sendingScreen').classList.remove('open');
-    iniciarCountdown(fecha);
-  }catch(err){
-    document.getElementById('sendingScreen').classList.remove('open');
-    document.body.style.overflow='';
-    mostrarToast('No se pudo enviar. Revisa la conexión e inténtalo de nuevo.','error');
-  }finally{
-    enviando=false;bloquearUI(false);
-  }
-}
 
-// ── COUNTDOWN 10 MINUTOS ────────────────────────────────────
-function iniciarCountdown(fecha){
-  document.getElementById('cancelScreen').classList.add('open');
-  const total=10*60; let restante=total;
-  actualizarDisplay(restante);
-  clearInterval(cdInterval);
-  cdInterval=setInterval(()=>{
-    restante--;
-    actualizarDisplay(restante);
-    if(restante<=0){
-      clearInterval(cdInterval);
-      confirmarDefinitivo(fecha);
-    }
-  },1000);
-  document.getElementById('cancelScreen').dataset.fecha=fecha;
-}
-
-function actualizarDisplay(seg){
-  const m=Math.floor(seg/60); const s=seg%60;
-  document.getElementById('cdNum').textContent=
-    String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
-  if(seg<=60){
-    document.getElementById('cdNum').style.color='#ff6b6b';
-  }
-}
-
-function confirmarDefinitivo(){
-  clearInterval(cdInterval);
-  const fecha=document.getElementById('cancelScreen').dataset.fecha||'';
-  document.getElementById('cancelScreen').classList.remove('open');
-  document.getElementById('successFecha').textContent=fecha;
-  document.getElementById('successScreen').classList.add('open');
-  mostrarBanner();
-}
-
-async function cancelarPedido(){
-  if(!idPedidoActual)return;
-  const btn=document.getElementById('btnCancelarPedido');
-  btn.disabled=true;btn.textContent='Cancelando...';
-  const msg=document.getElementById('cancelMsg');
   try{
     await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({accion:'cancelar',idPedido:idPedidoActual}),
+      body:JSON.stringify({
+        cliente,
+        fecha,
+        notas:(document.getElementById('notas')?.value||'').trim(),
+        productos:lin.map(([producto,cantidad])=>({producto,cantidad}))
+      }),
       mode:'no-cors'
     });
-    clearInterval(cdInterval);
-    document.getElementById('cancelScreen').classList.remove('open');
-    document.body.style.overflow='';
-    // Resetear formulario
-    for(const p in cantidades)cantidades[p]=0;
-    document.querySelectorAll('.qty-input').forEach(i=>i.value=0);
-    document.querySelectorAll('.product-row').forEach(r=>r.classList.remove('active'));
-    document.querySelectorAll('.badge').forEach(b=>b.textContent='0');
-    actualizarResumen();actualizarCarrito();
-    idPedidoActual=null;
-    mostrarToast('Pedido cancelado correctamente.','ok');
-    window.scrollTo({top:0,behavior:'smooth'});
-  }catch(e){
-    btn.disabled=false;btn.textContent='✕ Cancelar este pedido';
-    msg.textContent='Error al cancelar. Llama directamente a la tahona.';
+
+    document.getElementById('sendingScreen').classList.remove('open');
+    document.getElementById('successFecha').textContent=fecha;
+    document.getElementById('successScreen').classList.add('open');
+    mostrarBanner();
+  }catch(err){
+    document.getElementById('sendingScreen').classList.remove('open');
+    mostrarToast('No se pudo enviar. Revisa la conexión e inténtalo de nuevo.','error');
+  }finally{
+    enviando=false;
+    bloquearUI(false);
   }
 }
 
@@ -729,18 +1064,18 @@ function bloquearUI(b){
 }
 
 function nuevoPedido(){
-  clearInterval(cdInterval);
   document.getElementById('successScreen').classList.remove('open');
-  document.body.style.overflow='';
   for(const p in cantidades)cantidades[p]=0;
   document.querySelectorAll('.qty-input').forEach(i=>i.value=0);
   document.querySelectorAll('.product-row').forEach(r=>r.classList.remove('active'));
   document.querySelectorAll('.badge').forEach(b=>b.textContent='0');
-  const n=document.getElementById('notas');if(n)n.value='';
-  esDomingo=false;document.getElementById('domingoToggle').classList.remove('on');
-  facturaSolicitada=false;document.getElementById('facturaToggle').classList.remove('on');
-  idPedidoActual=null;
-  actualizarResumen();actualizarCarrito();bloqueDomingo();
+  const n=document.getElementById('notas');
+  if(n)n.value='';
+  esDomingo=false;
+  document.getElementById('domingoToggle').classList.remove('on');
+  actualizarResumen();
+  actualizarCarrito();
+  bloqueDomingo();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
