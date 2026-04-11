@@ -14,6 +14,7 @@
   .toast.error{background:var(--error);}
   .toast.ok{background:var(--ok);}
 
+  /* STICKY WRAPPER — header + resumen pegados arriba siempre */
   .sticky-top{position:sticky;top:0;z-index:100;}
   header{background:var(--azul);box-shadow:0 2px 10px rgba(0,32,92,0.35);}
   .header-logo{display:flex;justify-content:center;padding:10px 16px 0;}
@@ -38,6 +39,7 @@
   .resumen-top .r-val{font-size:15px;font-weight:700;color:var(--white);}
   .resumen-top .r-lbl{font-size:9px;color:rgba(255,255,255,0.7);}
   .resumen-top .divider{width:1px;height:24px;background:rgba(255,255,255,0.2);}
+  /* Botón Ver pedido — siempre visible */
   .btn-ver-pedido{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.35);border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700;color:var(--white);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background 0.15s;}
   .btn-ver-pedido:active{background:rgba(255,255,255,0.28);}
 
@@ -203,7 +205,7 @@
   <div class="r-item"><div class="r-val" id="rProductos">0</div><div class="r-lbl">Productos</div></div>
   <div class="divider"></div>
   <div class="r-item"><div class="r-val" id="rFamilias">0</div><div class="r-lbl">Familias</div></div>
-  <button class="btn-ver-pedido" id="btnVerPedido" type="button">🛒 Ver pedido</button>
+  <button class="btn-ver-pedido" id="btnVerPedido">🛒 Ver pedido</button>
 </div>
 </div>
 
@@ -222,7 +224,7 @@
       <div class="sb-empty">Aún no has añadido<br>ningún producto</div>
     </div>
     <div class="sb-footer">
-      <button class="btn-borrar-sb" onclick="borrarPedido()" type="button">🗑 Borrar todo el pedido</button>
+      <button class="btn-borrar-sb" onclick="borrarPedido()">🗑 Borrar todo el pedido</button>
     </div>
   </div>
 </div>
@@ -232,8 +234,8 @@
     <div class="b-total" id="bTotal">0 uds</div>
     <div class="b-sub" id="bSub">Sin productos seleccionados</div>
   </div>
-  <button class="btn-borrar" id="btnBorrar" onclick="borrarPedido()" type="button">🗑 Borrar</button>
-  <button class="btn-enviar" id="btnEnviar" onclick="abrirModal()" type="button">Enviar pedido</button>
+  <button class="btn-borrar" id="btnBorrar" onclick="borrarPedido()">🗑 Borrar</button>
+  <button class="btn-enviar" id="btnEnviar" onclick="abrirModal()">Enviar pedido</button>
 </div>
 
 <div class="carrito-overlay" id="carritoOverlay" onclick="cerrarCarrito()"></div>
@@ -241,13 +243,13 @@
   <div class="carrito-handle"></div>
   <div class="carrito-header">
     <h3>🛒 Lista de la compra</h3>
-    <button class="carrito-close" onclick="cerrarCarrito()" type="button">✕</button>
+    <button class="carrito-close" onclick="cerrarCarrito()">✕</button>
   </div>
   <div class="carrito-lista" id="carritoLista">
     <div class="carrito-empty">Aún no has añadido productos</div>
   </div>
   <div class="carrito-footer">
-    <button class="btn-borrar-carrito" onclick="borrarPedido();cerrarCarrito()" type="button">🗑 Borrar todo el pedido</button>
+    <button class="btn-borrar-carrito" onclick="borrarPedido();cerrarCarrito()">🗑 Borrar todo el pedido</button>
   </div>
 </div>
 
@@ -258,8 +260,8 @@
     <h2>Confirma tu pedido</h2>
     <div class="modal-fecha" id="modalFecha"></div>
     <div class="modal-detalle" id="modalDetalle"></div>
-    <button class="btn-confirmar" id="btnConfirmar" onclick="enviarPedido()" type="button">Confirmar y enviar</button>
-    <button class="btn-cancelar" onclick="cerrarModal()" type="button">Revisar pedido</button>
+    <button class="btn-confirmar" id="btnConfirmar" onclick="enviarPedido()">Confirmar y enviar</button>
+    <button class="btn-cancelar" onclick="cerrarModal()">Revisar pedido</button>
   </div>
 </div>
 
@@ -273,20 +275,12 @@
   <div class="s-check">✅</div>
   <h2>¡Pedido enviado!</h2>
   <p>Tu pedido ha sido registrado.<br>Lo recibirás <span class="s-oro" id="successFecha"></span>.</p>
-  <button class="btn-nuevo" onclick="nuevoPedido()" type="button">Hacer otro pedido</button>
+  <button class="btn-nuevo" onclick="nuevoPedido()">Hacer otro pedido</button>
 </div>
 
 <script>
 const SCRIPT_URL='https://script.google.com/macros/s/AKfycbxsAp0sSXdeAUzV_ZddDMO1DxJG5HXhmUWi8SJva8GeNvl_7H0HNyoykBvXWPpVdR0Q/exec';
-
-const FAMILIAS={
-  'Bollos':['Bollo Grande','Bollo Grande Picado','Bollo de Pellizco','Bollo Mediano','Bollo Mediano Liado','Bollo Chico','Bollo Chico Liado','Bollo 1/2 Kg','Bollo 1 Kg','Bollo Mini Hostelería','Bollo Mini Hostelería Liado'],
-  'Integrales':['Integral Chico','Integral Grande','Integral Multicereales Chico','Integral Multicereales Grande','Integral Nueces Chico','Integral Nueces Grande','Integral Pipas de Calabaza Chico','Integral Pipas de Calabaza Grande','Integral Chico Cuadrado','Integral Grande Cuadrado'],
-  'Molletes':['Mollete Chico','Mollete Grande','Mollete Extra','Mollete Chico Cuadrado','Mollete Grande Cuadrado','Yeye Barra 350','Yeye Barra','Yeye','Yeye Mini','Mollete Redondo Extra'],
-  'Prieto':['Prieto Chapata Grande','Prieto Pepito Anís','Prieto Pepito Ajonjolí','Prieto Mediano Ajonjolí','Prieto Grande','Prieto Grande Ajonjolí','Prieto Pepito','Prieto Mediano','Prieto Chapata Mediano','Prieto Pepito Mini'],
-  'Panadería':['Pan de Pueblo','Barra Rústica','Baguette','Hallulla 500gr','Hallulla Grande Sabores','Hallulla Grande','Hallulla','Pan de Pueblo 1 Kg','Pan de Pueblo 1,5 Kg','Pan de Aceituna'],
-  'Especiales':['Brioche Molde','Burguer 150','Burguer 115','Burguer Cerveza','Chatocao 125']
-};
+const FAMILIAS={'Bollos':['Bollo Grande','Bollo Grande Picado','Bollo de Pellizco','Bollo Mediano','Bollo Mediano Liado','Bollo Chico','Bollo Chico Liado','Bollo 1/2 Kg','Bollo 1 Kg','Bollo Mini Hostelería','Bollo Mini Hostelería Liado'],'Integrales':['Integral Chico','Integral Grande','Integral Multicereales Chico','Integral Multicereales Grande','Integral Nueces Chico','Integral Nueces Grande','Integral Pipas de Calabaza Chico','Integral Pipas de Calabaza Grande','Integral Chico Cuadrado','Integral Grande Cuadrado'],'Molletes':['Mollete Chico','Mollete Grande','Mollete Extra','Mollete Chico Cuadrado','Mollete Grande Cuadrado','Yeye Barra 350','Yeye Barra','Yeye','Yeye Mini','Mollete Redondo Extra'],'Prieto':['Prieto Chapata Grande','Prieto Pepito Anís','Prieto Pepito Ajonjolí','Prieto Mediano Ajonjolí','Prieto Grande','Prieto Grande Ajonjolí','Prieto Pepito','Prieto Mediano','Prieto Chapata Mediano','Prieto Pepito Mini'],'Panadería':['Pan de Pueblo','Barra Rústica','Baguette','Hallulla 500gr','Hallulla Grande Sabores','Hallulla Grande','Hallulla','Pan de Pueblo 1 Kg','Pan de Pueblo 1,5 Kg','Pan de Aceituna'],'Especiales':['Brioche Molde','Burguer 150','Burguer 115','Burguer Cerveza','Chatocao 125']};
 
 let cliente='',cantidades={},esDomingo=false,enviando=false,toastTimer=null;
 
@@ -354,7 +348,7 @@ function mostrarBanner(){
   const hab=getHab();
   const w=document.getElementById('bannerHabituales');
   if(!hab.length||!cliente){w.innerHTML='';return}
-  w.innerHTML=`<div class="banner-habituales"><div class="bh-icon">⭐</div><div class="bh-text"><div class="bh-title">Mostrando tus habituales</div><div class="bh-sub">${hab.length} producto${hab.length!==1?'s':''} · Pulsa ➕ para ver más</div></div><button class="btn-reset-hab" onclick="resetHab()" type="button">Ver todos</button></div>`;
+  w.innerHTML=`<div class="banner-habituales"><div class="bh-icon">⭐</div><div class="bh-text"><div class="bh-title">Mostrando tus habituales</div><div class="bh-sub">${hab.length} producto${hab.length!==1?'s':''} · Pulsa ➕ para ver más</div></div><button class="btn-reset-hab" onclick="resetHab()">Ver todos</button></div>`;
 }
 
 function generarFormulario(){
@@ -502,6 +496,7 @@ function actualizarResumen(){
   document.getElementById('bTotal').textContent=tot+' uds';
   document.getElementById('bSub').textContent=lin.length>0?lin.length+' producto'+(lin.length>1?'s':''):'Sin productos seleccionados';
 
+  // Botón Ver pedido — siempre visible, con contador cuando hay productos
   const btn=document.getElementById('btnVerPedido');
   if(btn){
     btn.textContent=tot>0?'🛒 Ver pedido ('+tot+')':'🛒 Ver pedido';
@@ -573,67 +568,42 @@ function cerrarModal(){
   document.getElementById('modalOverlay').classList.remove('open');
 }
 
-function fechaEntregaBackend(){
-  const r=document.getElementById('fechaEntrega').value;
-  if(!r)return'';
-  const [y,m,d]=r.split('-');
-  return `${d}/${m}/${y}`;
-}
-
 async function enviarPedido(){
   if(enviando)return;
-
   const lin=lineas();
   if(!lin.length)return;
-
-  const fechaTexto=fmtFecha();
-  const fecha=fechaEntregaBackend();
-  if(!fecha){
-    mostrarToast('Selecciona una fecha de entrega válida.','error');
-    return;
-  }
+  const fecha=fmtFecha();
+  if(!fecha)return;
 
   syncHab();
   enviando=true;
   bloquearUI(true);
   document.getElementById('modalOverlay').classList.remove('open');
   document.getElementById('sendingScreen').classList.add('open');
-  document.body.style.overflow='hidden';
+  document.body.style.overflow='hidden'; // bloquear scroll
 
   try{
-    const resp=await fetch(SCRIPT_URL,{
+    await fetch(SCRIPT_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         cliente,
         fecha,
-        fechaTexto,
-        domingo:esDomingo,
         notas:(document.getElementById('notas')?.value||'').trim(),
         productos:lin.map(([producto,cantidad])=>({producto,cantidad}))
-      })
+      }),
+      mode:'no-cors'
     });
 
-    const raw=await resp.text();
-    let data={};
-    try{ data = raw ? JSON.parse(raw) : {}; }catch(e){}
-
-    if(!resp.ok){
-      throw new Error('HTTP '+resp.status+' '+resp.statusText+(raw?(' · '+raw):''));
-    }
-    if(!data.ok){
-      throw new Error(data.error || 'El servidor no confirmó el pedido');
-    }
-
     document.getElementById('sendingScreen').classList.remove('open');
-    document.getElementById('successFecha').textContent=fechaTexto;
+    document.getElementById('successFecha').textContent=fecha;
     document.getElementById('successScreen').classList.add('open');
+    // overflow sigue bloqueado — se libera al pulsar "Hacer otro pedido"
     mostrarBanner();
-
   }catch(err){
     document.getElementById('sendingScreen').classList.remove('open');
-    document.body.style.overflow='';
-    mostrarToast('Error real al enviar: '+err.message,'error');
+    document.body.style.overflow=''; // liberar si hay error
+    mostrarToast('No se pudo enviar. Revisa la conexión e inténtalo de nuevo.','error');
   }finally{
     enviando=false;
     bloquearUI(false);
@@ -651,7 +621,7 @@ function bloquearUI(b){
 
 function nuevoPedido(){
   document.getElementById('successScreen').classList.remove('open');
-  document.body.style.overflow='';
+  document.body.style.overflow=''; // liberar scroll
   for(const p in cantidades)cantidades[p]=0;
   document.querySelectorAll('.qty-input').forEach(i=>i.value=0);
   document.querySelectorAll('.product-row').forEach(r=>r.classList.remove('active'));
