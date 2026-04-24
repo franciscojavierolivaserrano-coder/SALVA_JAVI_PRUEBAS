@@ -24,7 +24,7 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
 .toggle.on{background:var(--oro);}
 .toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;}
 .toggle.on::after{transform:translateX(18px);}
-.resumen{background:var(--azul2);display:flex;align-items:center;padding:7px 12px;gap:6px;}
+.resumen{background:var(--azul2);display:flex;align-items:center;padding:7px 12px;gap:6px;position:sticky;top:var(--header-h, 110px);z-index:99;}
 .r-item{flex:1;text-align:center;}
 .r-val{font-size:16px;font-weight:800;color:#fff;}
 .r-lbl{font-size:9px;color:rgba(255,255,255,0.65);margin-top:1px;}
@@ -96,10 +96,30 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
 .btn-confirmar{width:100%;background:var(--azul);color:#fff;border:none;border-radius:12px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;}
 .btn-confirmar:disabled{opacity:.55;cursor:not-allowed;}
 .btn-cancelar{width:100%;background:none;border:1.5px solid #dde3f0;border-radius:12px;padding:12px;font-size:14px;color:#888;cursor:pointer;}
-.sending-screen,.success-screen{display:none;position:fixed;inset:0;z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
+.sending-screen,.success-screen,.countdown-screen{display:none;position:fixed;inset:0;z-index:400;flex-direction:column;align-items:center;justify-content:center;padding:32px;text-align:center;}
 .sending-screen{background:rgba(0,32,92,0.95);}
-.sending-screen.open,.success-screen.open{display:flex;}
+.sending-screen.open,.success-screen.open,.countdown-screen.open{display:flex;}
 .success-screen{background:var(--azul);}
+.countdown-screen{background:rgba(0,0,0,0.6);padding:16px;}
+.cd-card{background:#fff;border-radius:20px;padding:24px 20px;width:100%;max-width:380px;max-height:90vh;overflow-y:auto;}
+.cd-ico{font-size:28px;margin-bottom:6px;}
+.cd-card h3{font-size:18px;color:var(--azul);font-weight:800;margin-bottom:3px;}
+.cd-card p{font-size:12px;color:#666;margin-bottom:12px;}
+.cd-detalle{background:#f5f8ff;border-radius:10px;padding:10px 12px;margin-bottom:16px;max-height:140px;overflow-y:auto;text-align:left;}
+.cd-linea{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid #e8eef8;}
+.cd-linea:last-child{border-bottom:none;}
+.cd-prod{color:#1a1a2e;flex:1;}
+.cd-cant{font-weight:700;color:var(--azul);background:#e8eef8;padding:1px 7px;border-radius:20px;font-size:11px;}
+.cd-timer-wrap{position:relative;width:90px;height:90px;margin:0 auto 10px;}
+.cd-ring{width:90px;height:90px;transform:rotate(-90deg);}
+.cd-ring-bg{fill:none;stroke:#e8eef8;stroke-width:6;}
+.cd-ring-prog{fill:none;stroke:var(--oro);stroke-width:6;stroke-linecap:round;stroke-dasharray:213.6;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;}
+.cd-timer-txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.cd-mins{font-size:20px;font-weight:800;color:var(--azul);}
+.cd-mins-lbl{font-size:9px;color:#888;}
+.cd-aviso{font-size:11px;color:#888;margin-bottom:14px;font-style:italic;}
+.btn-confirmar-ya{width:100%;background:var(--azul);color:#fff;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;}
+.btn-cancelar-cd{width:100%;background:none;border:1.5px solid #dde3f0;border-radius:12px;padding:11px;font-size:13px;color:#888;cursor:pointer;}
 .spinner{width:52px;height:52px;border:4px solid rgba(255,255,255,0.2);border-top-color:var(--oro);border-radius:50%;animation:spin .85s linear infinite;margin-bottom:18px;}
 .sending-screen h3{color:#fff;font-size:20px;margin-bottom:6px;}
 .sending-screen p{color:rgba(255,255,255,0.7);font-size:13px;}
@@ -178,6 +198,28 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
   <div class="spinner"></div>
   <h3>Enviando pedido...</h3>
   <p>Registrando en el sistema.</p>
+</div>
+
+<div class="countdown-screen" id="countdownScreen">
+  <div class="cd-card">
+    <div class="cd-ico">&#128203;</div>
+    <h3 id="cdTitulo">Pedido recibido</h3>
+    <p id="cdFecha"></p>
+    <div class="cd-detalle" id="cdDetalle"></div>
+    <div class="cd-timer-wrap">
+      <svg class="cd-ring" viewBox="0 0 80 80">
+        <circle class="cd-ring-bg" cx="40" cy="40" r="34"/>
+        <circle class="cd-ring-prog" id="cdRingProg" cx="40" cy="40" r="34"/>
+      </svg>
+      <div class="cd-timer-txt">
+        <div class="cd-mins" id="cdMins">10:00</div>
+        <div class="cd-mins-lbl">para confirmar</div>
+      </div>
+    </div>
+    <p class="cd-aviso">Si no haces nada, el pedido se enviara automaticamente.</p>
+    <button class="btn-confirmar-ya" id="btnConfirmarYa" onclick="confirmarYa()">Confirmar ahora</button>
+    <button class="btn-cancelar-cd" onclick="cancelarCuentaAtras()">Cancelar pedido</button>
+  </div>
 </div>
 
 <div class="success-screen" id="successScreen">
