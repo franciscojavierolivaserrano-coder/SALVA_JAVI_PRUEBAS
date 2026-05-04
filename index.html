@@ -171,15 +171,15 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
   <button class="btn-ver" id="btnVer" onclick="abrirModal()" disabled>Ver pedido</button>
 </div>
 
-<!-- ═══ HISTORIAL — VERSIÓN CON DIAGNÓSTICO VISIBLE ═════════ -->
-<div class="container" style="padding-bottom:0">
-  <div class="historial-card">
-    <div class="hist-header">
-      <span>🕐 Últimos pedidos</span>
-      <span id="histEstado" style="font-size:10px;color:#aaa;font-weight:400">Cargando...</span>
-    </div>
-    <div id="histItems">
-      <div style="padding:14px;font-size:12px;color:#aaa;text-align:center">Buscando historial...</div>
+<!-- ═══ HISTORIAL — usa POST igual que enviar pedido ═══════ -->
+<div id="historialWrapper" style="display:none">
+  <div class="container" style="padding-bottom:0">
+    <div class="historial-card">
+      <div class="hist-header" onclick="(function(){var it=document.getElementById('histItems'),ic=document.getElementById('histIco'),op=it.style.display==='none';it.style.display=op?'block':'none';ic.textContent=op?'\u25b2':'\u25bc';})()">
+        <span>🕐 Últimos pedidos</span>
+        <span id="histIco" style="font-size:10px;color:#aaa">▼</span>
+      </div>
+      <div id="histItems" style="display:none"></div>
     </div>
   </div>
 </div>
@@ -243,68 +243,26 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
   <button class="btn-nuevo" onclick="nuevoPedido()">Hacer otro pedido</button>
 </div>
 
-<!-- ═══ HISTORIAL — LÓGICA CON DIAGNÓSTICO ══════════════════ -->
+<!-- ═══ HISTORIAL — usa POST (mismo método que enviar pedido) -->
 <script>
 var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGYLahIhYRcXaf0nvOqVO_lR-QmcUX1qRq5ArD_o-bJICMlZ9aquo_lRTE8qCVz5Uw/exec';
 
-function setEstado(txt, color) {
-  var el = document.getElementById('histEstado');
-  if (el) {
-    el.textContent = txt;
-    el.style.color = color || '#aaa';
-  }
-}
-
-function setMensaje(html) {
-  var el = document.getElementById('histItems');
-  if (el) el.innerHTML = html;
-}
-
 function cargarHistorial(cliente) {
-  console.log('[HIST] cargarHistorial cliente=', cliente);
-  if (!cliente) {
-    setEstado('Sin cliente', '#d9534f');
-    setMensaje('<div style="padding:14px;font-size:12px;color:#aaa;text-align:center">No hay cliente en la URL</div>');
-    return;
-  }
+  if (!cliente) return;
+  console.log('[HIST] POST historial cliente=', cliente);
 
-  var url = SCRIPT_URL + '?action=historial&cliente=' + encodeURIComponent(cliente);
-  console.log('[HIST] fetch URL:', url);
+  // POST con Content-Type text/plain → mismo método que ya funciona
+  // para enviar pedidos. Evita el preflight CORS.
+  fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ accion: 'historial', cliente: cliente })
+  })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      console.log('[HIST] respuesta:', data);
+      if (!data.ok || !data.historial || !data.historial.length) return;
 
-  fetch(url)
-    .then(function(r) {
-      console.log('[HIST] response status:', r.status, 'content-type:', r.headers.get('content-type'));
-      return r.text();  // primero como texto para diagnóstico
-    })
-    .then(function(txt) {
-      console.log('[HIST] respuesta cruda:', txt.substring(0, 200));
-      var data;
-      try {
-        data = JSON.parse(txt);
-      } catch(e) {
-        // Si llega HTML en vez de JSON → falta redesplegar
-        setEstado('⚠️ Falta redesplegar', '#d9534f');
-        setMensaje(
-          '<div style="padding:14px;font-size:12px;color:#d9534f;line-height:1.6">' +
-          '<b>El Apps Script devuelve HTML, no JSON.</b><br>' +
-          'Tienes que <b>redesplegar</b> el Apps Script como nueva versión.<br>' +
-          '<small style="color:#888">Apps Script → Implementar → Gestionar implementaciones → Editar (lápiz) → Versión: Nueva versión → Implementar</small>' +
-          '</div>'
-        );
-        return;
-      }
-      if (!data.ok) {
-        setEstado('Error', '#d9534f');
-        setMensaje('<div style="padding:14px;font-size:12px;color:#d9534f">Error: ' + (data.error || 'desconocido') + '</div>');
-        return;
-      }
-      if (!data.historial || !data.historial.length) {
-        setEstado('Sin pedidos previos', '#888');
-        setMensaje('<div style="padding:14px;font-size:12px;color:#aaa;text-align:center">Aún no hay pedidos anteriores de este cliente</div>');
-        return;
-      }
-      // ÉXITO
-      setEstado(data.historial.length + ' pedidos', '#25b46b');
       var html = '';
       data.historial.forEach(function(p) {
         var resumen = p.productos.map(function(x) { return x.producto + ' \xd7' + x.cantidad; }).join(' \xb7 ');
@@ -318,12 +276,13 @@ function cargarHistorial(cliente) {
               +   '<button class="btn-repedir" onclick="repetirPedidoHistorial(\'' + prods + '\')">Repetir</button>'
               + '</div>';
       });
-      setMensaje(html);
+      document.getElementById('histItems').innerHTML = html;
+      document.getElementById('historialWrapper').style.display = 'block';
+      document.getElementById('histItems').style.display = 'block';
+      document.getElementById('histIco').textContent = '\u25b2';
     })
     .catch(function(err) {
-      console.error('[HIST] fetch error:', err);
-      setEstado('Error red', '#d9534f');
-      setMensaje('<div style="padding:14px;font-size:12px;color:#d9534f">Error de red: ' + (err.message || err) + '</div>');
+      console.error('[HIST] error:', err);
     });
 }
 
@@ -348,7 +307,7 @@ window.repetirPedidoHistorial = function(prodsRaw) {
   if (toast) {
     toast.textContent = cargados > 0
       ? '\u2705 ' + cargados + ' producto' + (cargados > 1 ? 's cargados' : ' cargado')
-      : '\u26a0\ufe0f No se encontraron los productos (revisa data-producto en app.js)';
+      : '\u26a0\ufe0f No se encontraron los productos';
     toast.className = 'toast ' + (cargados > 0 ? 'ok' : '') + ' show';
     setTimeout(function() { toast.className = 'toast'; }, 3500);
   }
@@ -360,8 +319,7 @@ window.repetirPedidoHistorial = function(prodsRaw) {
 
 window.addEventListener('load', function() {
   var cliente = new URLSearchParams(window.location.search).get('cliente') || '';
-  console.log('[HIST] cliente en URL:', cliente);
-  setTimeout(function() { cargarHistorial(cliente); }, 500);
+  if (cliente) setTimeout(function() { cargarHistorial(cliente); }, 800);
 });
 </script>
 <!-- ═══ FIN historial ═══════════════════════════════════════ -->
