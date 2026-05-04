@@ -171,6 +171,20 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
   <button class="btn-ver" id="btnVer" onclick="abrirModal()" disabled>Ver pedido</button>
 </div>
 
+<!-- ═══ HISTORIAL — VERSIÓN CON DIAGNÓSTICO VISIBLE ═════════ -->
+<div class="container" style="padding-bottom:0">
+  <div class="historial-card">
+    <div class="hist-header">
+      <span>🕐 Últimos pedidos</span>
+      <span id="histEstado" style="font-size:10px;color:#aaa;font-weight:400">Cargando...</span>
+    </div>
+    <div id="histItems">
+      <div style="padding:14px;font-size:12px;color:#aaa;text-align:center">Buscando historial...</div>
+    </div>
+  </div>
+</div>
+<!-- ═══ FIN historial ═══════════════════════════════════════ -->
+
 <div class="container" id="mainContainer"></div>
 
 <div class="bottom-bar">
@@ -228,6 +242,129 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
   <p>Tu pedido ha sido registrado.<br>Lo recibiras el <span class="s-oro" id="successFecha"></span>.</p>
   <button class="btn-nuevo" onclick="nuevoPedido()">Hacer otro pedido</button>
 </div>
+
+<!-- ═══ HISTORIAL — LÓGICA CON DIAGNÓSTICO ══════════════════ -->
+<script>
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGYLahIhYRcXaf0nvOqVO_lR-QmcUX1qRq5ArD_o-bJICMlZ9aquo_lRTE8qCVz5Uw/exec';
+
+function setEstado(txt, color) {
+  var el = document.getElementById('histEstado');
+  if (el) {
+    el.textContent = txt;
+    el.style.color = color || '#aaa';
+  }
+}
+
+function setMensaje(html) {
+  var el = document.getElementById('histItems');
+  if (el) el.innerHTML = html;
+}
+
+function cargarHistorial(cliente) {
+  console.log('[HIST] cargarHistorial cliente=', cliente);
+  if (!cliente) {
+    setEstado('Sin cliente', '#d9534f');
+    setMensaje('<div style="padding:14px;font-size:12px;color:#aaa;text-align:center">No hay cliente en la URL</div>');
+    return;
+  }
+
+  var url = SCRIPT_URL + '?action=historial&cliente=' + encodeURIComponent(cliente);
+  console.log('[HIST] fetch URL:', url);
+
+  fetch(url)
+    .then(function(r) {
+      console.log('[HIST] response status:', r.status, 'content-type:', r.headers.get('content-type'));
+      return r.text();  // primero como texto para diagnóstico
+    })
+    .then(function(txt) {
+      console.log('[HIST] respuesta cruda:', txt.substring(0, 200));
+      var data;
+      try {
+        data = JSON.parse(txt);
+      } catch(e) {
+        // Si llega HTML en vez de JSON → falta redesplegar
+        setEstado('⚠️ Falta redesplegar', '#d9534f');
+        setMensaje(
+          '<div style="padding:14px;font-size:12px;color:#d9534f;line-height:1.6">' +
+          '<b>El Apps Script devuelve HTML, no JSON.</b><br>' +
+          'Tienes que <b>redesplegar</b> el Apps Script como nueva versión.<br>' +
+          '<small style="color:#888">Apps Script → Implementar → Gestionar implementaciones → Editar (lápiz) → Versión: Nueva versión → Implementar</small>' +
+          '</div>'
+        );
+        return;
+      }
+      if (!data.ok) {
+        setEstado('Error', '#d9534f');
+        setMensaje('<div style="padding:14px;font-size:12px;color:#d9534f">Error: ' + (data.error || 'desconocido') + '</div>');
+        return;
+      }
+      if (!data.historial || !data.historial.length) {
+        setEstado('Sin pedidos previos', '#888');
+        setMensaje('<div style="padding:14px;font-size:12px;color:#aaa;text-align:center">Aún no hay pedidos anteriores de este cliente</div>');
+        return;
+      }
+      // ÉXITO
+      setEstado(data.historial.length + ' pedidos', '#25b46b');
+      var html = '';
+      data.historial.forEach(function(p) {
+        var resumen = p.productos.map(function(x) { return x.producto + ' \xd7' + x.cantidad; }).join(' \xb7 ');
+        var corto   = resumen.length > 55 ? resumen.substring(0, 52) + '\u2026' : resumen;
+        var prods   = JSON.stringify(p.productos).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        html += '<div class="hist-item">'
+              +   '<div style="flex:1;min-width:0">'
+              +     '<div class="hist-fecha">' + (p.diaSemana || '') + ' \u2014 entrega ' + (p.fechaEntrega || '') + '</div>'
+              +     '<div class="hist-prods" title="' + resumen + '">' + corto + '</div>'
+              +   '</div>'
+              +   '<button class="btn-repedir" onclick="repetirPedidoHistorial(\'' + prods + '\')">Repetir</button>'
+              + '</div>';
+      });
+      setMensaje(html);
+    })
+    .catch(function(err) {
+      console.error('[HIST] fetch error:', err);
+      setEstado('Error red', '#d9534f');
+      setMensaje('<div style="padding:14px;font-size:12px;color:#d9534f">Error de red: ' + (err.message || err) + '</div>');
+    });
+}
+
+window.repetirPedidoHistorial = function(prodsRaw) {
+  var productos;
+  try { productos = JSON.parse(prodsRaw); } catch(e) { return; }
+  var cargados = 0;
+  productos.forEach(function(p) {
+    var inputs = document.querySelectorAll('.qty-input');
+    for (var i = 0; i < inputs.length; i++) {
+      var attr = inputs[i].dataset.producto || inputs[i].getAttribute('data-producto') || '';
+      if (attr === p.producto) {
+        inputs[i].value = p.cantidad;
+        inputs[i].dispatchEvent(new Event('input',  { bubbles: true }));
+        inputs[i].dispatchEvent(new Event('change', { bubbles: true }));
+        cargados++;
+        break;
+      }
+    }
+  });
+  var toast = document.getElementById('toast');
+  if (toast) {
+    toast.textContent = cargados > 0
+      ? '\u2705 ' + cargados + ' producto' + (cargados > 1 ? 's cargados' : ' cargado')
+      : '\u26a0\ufe0f No se encontraron los productos (revisa data-producto en app.js)';
+    toast.className = 'toast ' + (cargados > 0 ? 'ok' : '') + ' show';
+    setTimeout(function() { toast.className = 'toast'; }, 3500);
+  }
+  if (cargados > 0) {
+    var mc = document.getElementById('mainContainer');
+    if (mc) mc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+};
+
+window.addEventListener('load', function() {
+  var cliente = new URLSearchParams(window.location.search).get('cliente') || '';
+  console.log('[HIST] cliente en URL:', cliente);
+  setTimeout(function() { cargarHistorial(cliente); }, 500);
+});
+</script>
+<!-- ═══ FIN historial ═══════════════════════════════════════ -->
 
 <script src="app.js"></script>
 </body>
