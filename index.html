@@ -171,7 +171,7 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
   <button class="btn-ver" id="btnVer" onclick="abrirModal()" disabled>Ver pedido</button>
 </div>
 
-<!-- ═══ HISTORIAL — usa POST igual que enviar pedido ═══════ -->
+<!-- ═══ HISTORIAL — bloque oculto, se muestra si hay datos ═══ -->
 <div id="historialWrapper" style="display:none">
   <div class="container" style="padding-bottom:0">
     <div class="historial-card">
@@ -243,86 +243,92 @@ header{background:var(--azul);position:sticky;top:0;z-index:100;box-shadow:0 3px
   <button class="btn-nuevo" onclick="nuevoPedido()">Hacer otro pedido</button>
 </div>
 
-<!-- ═══ HISTORIAL — usa POST (mismo método que enviar pedido) -->
+<!-- ═══ HISTORIAL — IIFE para no contaminar el espacio global ═══
+     Sin variables globales: nada puede chocar con app.js
+═════════════════════════════════════════════════════════════════ -->
 <script>
-var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzGYLahIhYRcXaf0nvOqVO_lR-QmcUX1qRq5ArD_o-bJICMlZ9aquo_lRTE8qCVz5Uw/exec';
+(function() {
+  var HISTORIAL_URL = 'https://script.google.com/macros/s/AKfycbzGYLahIhYRcXaf0nvOqVO_lR-QmcUX1qRq5ArD_o-bJICMlZ9aquo_lRTE8qCVz5Uw/exec';
 
-function cargarHistorial(cliente) {
-  if (!cliente) return;
-  console.log('[HIST] POST historial cliente=', cliente);
-
-  // POST con Content-Type text/plain → mismo método que ya funciona
-  // para enviar pedidos. Evita el preflight CORS.
-  fetch(SCRIPT_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ accion: 'historial', cliente: cliente })
-  })
-    .then(function(r) { return r.json(); })
-    .then(function(data) {
-      console.log('[HIST] respuesta:', data);
-      if (!data.ok || !data.historial || !data.historial.length) return;
-
-      var html = '';
-      data.historial.forEach(function(p) {
-        var resumen = p.productos.map(function(x) { return x.producto + ' \xd7' + x.cantidad; }).join(' \xb7 ');
-        var corto   = resumen.length > 55 ? resumen.substring(0, 52) + '\u2026' : resumen;
-        var prods   = JSON.stringify(p.productos).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        html += '<div class="hist-item">'
-              +   '<div style="flex:1;min-width:0">'
-              +     '<div class="hist-fecha">' + (p.diaSemana || '') + ' \u2014 entrega ' + (p.fechaEntrega || '') + '</div>'
-              +     '<div class="hist-prods" title="' + resumen + '">' + corto + '</div>'
-              +   '</div>'
-              +   '<button class="btn-repedir" onclick="repetirPedidoHistorial(\'' + prods + '\')">Repetir</button>'
-              + '</div>';
-      });
-      document.getElementById('histItems').innerHTML = html;
-      document.getElementById('historialWrapper').style.display = 'block';
-      document.getElementById('histItems').style.display = 'block';
-      document.getElementById('histIco').textContent = '\u25b2';
+  function cargarHistorialCliente(cliente) {
+    if (!cliente) return;
+    fetch(HISTORIAL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ accion: 'historial', cliente: cliente })
     })
-    .catch(function(err) {
-      console.error('[HIST] error:', err);
-    });
-}
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data || !data.ok || !data.historial || !data.historial.length) return;
+        var html = '';
+        data.historial.forEach(function(p) {
+          var resumen = p.productos.map(function(x) { return x.producto + ' \xd7' + x.cantidad; }).join(' \xb7 ');
+          var corto   = resumen.length > 55 ? resumen.substring(0, 52) + '\u2026' : resumen;
+          var prods   = JSON.stringify(p.productos).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+          html += '<div class="hist-item">'
+                +   '<div style="flex:1;min-width:0">'
+                +     '<div class="hist-fecha">' + (p.diaSemana || '') + ' \u2014 entrega ' + (p.fechaEntrega || '') + '</div>'
+                +     '<div class="hist-prods" title="' + resumen + '">' + corto + '</div>'
+                +   '</div>'
+                +   '<button class="btn-repedir" onclick="window.__repetirPedidoHist(\'' + prods + '\')">Repetir</button>'
+                + '</div>';
+        });
+        document.getElementById('histItems').innerHTML = html;
+        document.getElementById('historialWrapper').style.display = 'block';
+        document.getElementById('histItems').style.display = 'block';
+        document.getElementById('histIco').textContent = '\u25b2';
+      })
+      .catch(function() {});  // silencioso
+  }
 
-window.repetirPedidoHistorial = function(prodsRaw) {
-  var productos;
-  try { productos = JSON.parse(prodsRaw); } catch(e) { return; }
-  var cargados = 0;
-  productos.forEach(function(p) {
-    var inputs = document.querySelectorAll('.qty-input');
-    for (var i = 0; i < inputs.length; i++) {
-      var attr = inputs[i].dataset.producto || inputs[i].getAttribute('data-producto') || '';
-      if (attr === p.producto) {
-        inputs[i].value = p.cantidad;
-        inputs[i].dispatchEvent(new Event('input',  { bubbles: true }));
-        inputs[i].dispatchEvent(new Event('change', { bubbles: true }));
-        cargados++;
-        break;
+  // Función pública en window con prefijo único — no choca con nada
+  window.__repetirPedidoHist = function(prodsRaw) {
+    var productos;
+    try { productos = JSON.parse(prodsRaw); } catch(e) { return; }
+    var cargados = 0;
+    productos.forEach(function(p) {
+      var inputs = document.querySelectorAll('.qty-input');
+      for (var i = 0; i < inputs.length; i++) {
+        var attr = inputs[i].dataset.producto || inputs[i].getAttribute('data-producto') || '';
+        if (attr === p.producto) {
+          inputs[i].value = p.cantidad;
+          inputs[i].dispatchEvent(new Event('input',  { bubbles: true }));
+          inputs[i].dispatchEvent(new Event('change', { bubbles: true }));
+          cargados++;
+          break;
+        }
       }
+    });
+    var toast = document.getElementById('toast');
+    if (toast) {
+      toast.textContent = cargados > 0
+        ? '\u2705 ' + cargados + ' producto' + (cargados > 1 ? 's cargados' : ' cargado')
+        : '\u26a0\ufe0f No se encontraron los productos';
+      toast.className = 'toast ' + (cargados > 0 ? 'ok' : '') + ' show';
+      setTimeout(function() { toast.className = 'toast'; }, 3500);
     }
-  });
-  var toast = document.getElementById('toast');
-  if (toast) {
-    toast.textContent = cargados > 0
-      ? '\u2705 ' + cargados + ' producto' + (cargados > 1 ? 's cargados' : ' cargado')
-      : '\u26a0\ufe0f No se encontraron los productos';
-    toast.className = 'toast ' + (cargados > 0 ? 'ok' : '') + ' show';
-    setTimeout(function() { toast.className = 'toast'; }, 3500);
-  }
-  if (cargados > 0) {
-    var mc = document.getElementById('mainContainer');
-    if (mc) mc.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-};
+    if (cargados > 0) {
+      var mc = document.getElementById('mainContainer');
+      if (mc) mc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
-window.addEventListener('load', function() {
-  var cliente = new URLSearchParams(window.location.search).get('cliente') || '';
-  if (cliente) setTimeout(function() { cargarHistorial(cliente); }, 800);
-});
+  // Disparar al cargar — esperar a que app.js termine
+  if (document.readyState === 'complete') {
+    setTimeout(initHistorial, 1200);
+  } else {
+    window.addEventListener('load', function() {
+      setTimeout(initHistorial, 1200);
+    });
+  }
+
+  function initHistorial() {
+    var cliente = new URLSearchParams(window.location.search).get('cliente') || '';
+    if (cliente) cargarHistorialCliente(cliente);
+  }
+})();
 </script>
-<!-- ═══ FIN historial ═══════════════════════════════════════ -->
+<!-- ═══ FIN historial ═══════════════════════════════════════════ -->
 
 <script src="app.js"></script>
 </body>
